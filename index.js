@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Cryptojs = require("crypto-js");
-var objDb = require('/object/database.js');
+var objDb = require('object/database.js');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 
