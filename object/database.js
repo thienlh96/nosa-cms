@@ -16,7 +16,7 @@ SERVER_URL = (process.env.SERVER_URL) ?
 
 
 var dbQueryCounter = 0;
-var maxDbIdleTime = 5000; 
+var maxDbIdleTime = 5000;
 module.exports = {
 	getConnection: function (callback) {
 
@@ -50,8 +50,8 @@ module.exports = {
 	},
 	findProvincialTemp: function (query, client, callback) {
 		// Get the documents collection
-	const db = client.db(DATA_BASE_NAME);
-	const collection = db.collection('ProvincialTemp');
+		const db = client.db(DATA_BASE_NAME);
+		const collection = db.collection('ProvincialTemp');
 		// Find some documents
 		collection.find(query).sort({
 			"Name": 1
@@ -321,7 +321,7 @@ module.exports = {
 		var inputDate = new Date(mydate.toISOString());
 		// Get the documents collection
 		const db = client.db(DATA_BASE_NAME);
-	    const collection = db.collection('Members');
+		const collection = db.collection('Members');
 		//var objCallback = null;
 		collection.find({
 			'_id': objMember._id
@@ -620,8 +620,7 @@ module.exports = {
 	},
 	insertMembersActive: function (psid, client, callback) {
 
-		try
-		{
+		try {
 			var d = new Date();
 			d.setMinutes(d.getMinutes() + 15);
 			const db = client.db(DATA_BASE_NAME);
@@ -644,7 +643,7 @@ module.exports = {
 							//neu xay ra loi
 							if (err) throw err;
 							//neu khong co loi
-						console.log("Insert MembersActive ExpiredDate:", objMember);
+							console.log("Insert MembersActive ExpiredDate:", objMember);
 							callback(null, res);
 						});
 
@@ -669,10 +668,10 @@ module.exports = {
 
 				}
 			});
-	  } catch(err) {
-         console.error(err);
-		 callback(null, null);
-      }
+		} catch (err) {
+			console.error(err);
+			callback(null, null);
+		}
 	},
 
 	updateAvatarMemeber: function (psid, url, client, callback) {

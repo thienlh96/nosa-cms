@@ -1,11 +1,11 @@
 {
-    "appSecret": "41f70bfc8758b4606abce749e62b7911",
-    "pageAccessToken": "EAAcglpa4M6kBADkjHU8zPEOb699YfnwsEvNMaYso6G9BBJ7ignsfkfbHcbd8EyUXn8ucsZC7EoZAEPM96ydZA8Rqj5Hoqweus33uCoPh8vqZBmqpp53lFSesix1FZA6PEEmvZBKCFtkBLlT0oGcecV0aenxk1A5AoKQ96pcZB5GcQZDZD",
-    "validationToken": "verify-token-nsvn",
-    "serverURL": "https://nosa-cms.herokuapp.com/",
-	"mongoUrl": "mongodb://nosavnnet:nsvn6688@nosavn.net:27018/?authMechanism=SCRAM-SHA-1&authSource=Nosa&connectTimeoutMS=30000&maxIdleTimeMS=600000",
-	"databasename":"Nosa",
-	"image_cloud_name":"nosavn-net",
-	"image_api_key":"617126195119673",
-	"image_api_secret":"8b6rlInYhs6Bubhiu3HsNg3OoVw"
+  "appSecret": "3f89307ad0f7ff9b28416ed0c836df68",
+  "pageAccessToken": "EAAbvSU7d21MBAOF3mgc3TzATneC6tYXcqy16ViLeKxs8txehxnaaH9MRnPRSevF714ZC6BqFzqaTQU3c169tFxZB6yIcXcHxMqJs4Q2DaMrOkrtL9ZA2KBtHKmch73TKJwcMEOMP351trQGX0dQKbi1edlZCIk3ECsyxbL5a8gZDZD",
+  "validationToken": "verify-token-nsvn",
+  "serverURL": "https://nosa-cms.herokuapp.com/",
+  "mongoUrl": "mongodb://nosavnnet:nsvn6688@nosavn.net:27018/?authMechanism=SCRAM-SHA-1&authSource=Nosa&connectTimeoutMS=30000&maxIdleTimeMS=600000",
+  "databasename": "Nosa",
+  "image_cloud_name": "nosavn-net",
+  "image_api_key": "617126195119673",
+  "image_api_secret": "8b6rlInYhs6Bubhiu3HsNg3OoVw"
 }
