@@ -15,6 +15,12 @@ router.get('/', function (req, res, next) {
 	});
 });
 
+router.get('/index.html', function (req, res, next) {
+	res.sendFile('index.html', {
+		root: "views/cms"
+	});
+});
+
 router.get('/member.html', function (req, res, next) {
 	res.sendFile('member.html', {
 		root: "views/cms"
