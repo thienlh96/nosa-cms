@@ -1,0 +1,11 @@
+{
+    "appSecret": "41f70bfc8758b4606abce749e62b7911",
+    "pageAccessToken": "EAAcglpa4M6kBADkjHU8zPEOb699YfnwsEvNMaYso6G9BBJ7ignsfkfbHcbd8EyUXn8ucsZC7EoZAEPM96ydZA8Rqj5Hoqweus33uCoPh8vqZBmqpp53lFSesix1FZA6PEEmvZBKCFtkBLlT0oGcecV0aenxk1A5AoKQ96pcZB5GcQZDZD",
+    "validationToken": "verify-token-nsvn",
+    "serverURL": "https://nosavhttps://chat-bot-test-thien.herokuapp.com/",
+	"mongoUrl":"mongodb://nosavnnet:nsvn6688@localhost:27017/Nosa?readPreference=primary",
+	"databasename":"Nosa",
+	"image_cloud_name":"nosavn-net",
+	"image_api_key":"617126195119673",
+	"image_api_secret":"8b6rlInYhs6Bubhiu3HsNg3OoVw"
+}
