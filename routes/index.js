@@ -15,13 +15,13 @@ router.get('/', function (req, res, next) {
 	});
 });
 
-router.get('/member', function (req, res, next) {
+router.get('/member.html', function (req, res, next) {
 	res.sendFile('member.html', {
 		root: "views/cms"
 	});
 });
 
-router.get('/chart', function (req, res, next) {
+router.get('/chart.html', function (req, res, next) {
 	res.sendFile('chart.html', {
 		root: "views/cms"
 	});
