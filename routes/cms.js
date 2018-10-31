@@ -9,11 +9,6 @@ const session = require('express-session');
 router.use(bodyParser.json());
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
-    res.sendFile('login.html', {
-        root: "views/cms"
-    });
-});
 
 router.get('/member', function (req, res, next) {
     res.sendFile('member.html', {
