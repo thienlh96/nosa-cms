@@ -1,9 +1,9 @@
 {
-  "name": "nosa-cms",
+  "name": "chatbot",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./routes/index.js"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "aws-sdk": "^2.296.0",
