@@ -1,151 +1,315 @@
 var express = require('express');
 var router = express.Router();
-const { MessengerClient } = require('messaging-api-messenger');
-var config = require('config');
+var Cryptojs = require("crypto-js"); //Toanva add
 
-// App Secret can be retrieved from the App Dashboard
-const APP_SECRET = (process.env.MESSENGER_APP_SECRET) ?
-	process.env.MESSENGER_APP_SECRET :
-	config.get('appSecret');
+var objDb = require('../object/database.js');
+const bodyParser = require('body-parser');
+const session = require('express-session');
 
-// Arbitrary value used to validate a webhook
-const VALIDATION_TOKEN = (process.env.MESSENGER_VALIDATION_TOKEN) ?
-	(process.env.MESSENGER_VALIDATION_TOKEN) :
-	config.get('validationToken');
+router.use(bodyParser.json());
 
-// Generate a page access token for your page from the App Dashboard
-const PAGE_ACCESS_TOKEN = (process.env.MESSENGER_PAGE_ACCESS_TOKEN) ?
-	(process.env.MESSENGER_PAGE_ACCESS_TOKEN) :
-	config.get('pageAccessToken');
-
-//const client = MessengerClient.connect();
-const client = MessengerClient.connect({
-  accessToken: PAGE_ACCESS_TOKEN,
-  version: '3.1',
+/* GET users listing. */
+router.get('/', function (req, res, next) {
+	res.sendFile('login.html', {
+		root: "views/cms"
+	});
 });
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('hksv', { title: 'CUỘC THI HOA KHÔI SINH VIÊN VIỆT NAM 2018 chatbot on Facebook Messenger' });
+router.get('/member', function (req, res, next) {
+	res.sendFile('member.html', {
+		root: "views/cms"
+	});
 });
 
-router.get('/facebook', function(req, res, next) {
- 
-	console.log("get facebook")
-	if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === VALIDATION_TOKEN) {
-		console.log("Validating webhook facebook : ", req.query['first_name']);
-		res.status(200).send(req.query['hub.challenge']);
+router.get('/chart', function (req, res, next) {
+	res.sendFile('chart.html', {
+		root: "views/cms"
+	});
+});
+
+//Toanva add getkeyCMS
+router.post('/getkeyCMS', function (req, res) {
+	let body = req.body;
+	if (req.session.cms_key == null) {
+		req.session.cms_key = req.sessionID;
+		res.send(req.sessionID);
 	} else {
-		console.log("Không xác nhận. Đảm bảo rằng token hợp lệ phù hợp.");
-		res.sendStatus(403);
+		res.send(req.session.cms_key);
 	}
-	
 });
-
-router.post('/facebook', function(req, res, next) {
- 
-	var data = req.body;
-	console.log("Res Post facebook");
-
-	// Checks this is an event from a page subscription
-	if (data.object === 'page') {
-
-		// Iterates over each entry - there may be multiple if batched
-		data.entry.forEach(function (pageEntry) {
-			var pageID = pageEntry.id;
-			var timeOfEvent = pageEntry.time;
-			if (pageEntry.messaging) {
-				pageEntry.messaging.forEach(function (messagingEvent) {
-
-					//console.log("face event", messagingEvent.postback.payload);
-					if (messagingEvent.message) {
-						//console.log("Res Post facebook 1");
-						receivedMessage(messagingEvent);
-
-
-					} else if (messagingEvent.delivery) {
-						console.log("Res Post delivery");
-						////receivedDeliveryConfirmation(messagingEvent);
-					} else if (messagingEvent.postback && messagingEvent.postback.payload == 'getstarted') {
-						//present user with some greeting or call to action
-
-						
-					} else if (messagingEvent.postback && messagingEvent.postback.payload == 'confirm') {
-						//present user 'confirm':				
-						//sendMessageConfimRegister(messagingEvent.sender.id);
-
-					} else {
-						console.log("Facebook Webhook received unknown messagingEvent: ", messagingEvent);
-					}
-					////// Cập nhật lại thời gian hết hạn của member để đếm số thành viên đang hoạt động với bót
-				
-
-				});
-			} else {
-				console.log("Messaging undefined");
+//Toanva add getMemberCMS
+router.get('/getMemberCMS', (req, res) => {
+	if (req.session == null || req.session.admin == null) {
+		return res.sendStatus(401);
+	}
+	var name = req.query.name;
+	var psid = req.query.psid;
+	var provincial = req.query.provincial;
+	var districts = req.query.districts;
+	var wards = req.query.wards;
+	var position = req.query.position;
+	var level = req.query.level;
+	var layer = req.query.layer;
+	var blockstatus = req.query.blockstatus;
+	var phone = req.query.phone;
+	if (psid == null || psid == 'all')
+		psid = "";
+	if (name == null || name == 'all')
+		name = "";
+	if (provincial == null || provincial == 'all' || provincial == 'NA')
+		provincial = "";
+	if (districts == null || districts == 'all' || districts == 'NA')
+		districts = "";
+	if (wards == null || wards == 'all' || wards == 'NA')
+		wards = "";
+	if (position == null || position == 'all' || position == 'NA')
+		position = "";
+	if (level == null || level == 'all' || level == 'NA')
+		level = "";
+	if (layer == null || layer == 'all' || layer == 'NA')
+		layer = "";
+	if (blockstatus == null || blockstatus == 'all')
+		blockstatus = "";
+	if (phone == null || phone == 'all')
+		phone = "";
+	var query = {};
+	if (name != "") {
+		name = ".*" + name + ".*";
+		Object.assign(query, {
+			Name: {
+				$regex: name
 			}
-
 		});
-
-		// Returns a '200 OK' response to all requests
-		res.status(200).send('EVENT_RECEIVED');
-	} else {
-		// Returns a '404 Not Found' if event is not from a page subscription
-		res.sendStatus(404);
 	}
-	
-	
+	if (psid != "") {
+		Object.assign(query, {
+			_id: psid
+		});
+	}
+	if (blockstatus != "") {
+		Object.assign(query, {
+			BlockStatus: blockstatus
+		});
+	}
+	if (phone != "") {
+		phone = ".*" + phone + ".*";
+		Object.assign(query, {
+			Phone: {
+				$regex: phone
+			}
+		});
+	}
+
+	if (provincial != "") {
+		Object.assign(query, {
+			Provincial: provincial
+		});
+	}
+	if (districts != "") {
+		Object.assign(query, {
+			District: districts
+		});
+	}
+	if (wards != "") {
+		Object.assign(query, {
+			Ward: wards
+		});
+	}
+	if (position != "") {
+		Object.assign(query, {
+			Position: position
+		});
+	}
+	console.log("GetMemberCMS query", query);
+	objDb.getConnection(function (client) {
+		objDb.findMembers(query, client, function (results) {
+			client.close();
+			res.send(results);
+		});
+	});
+});
+//Toanva getMemberCMS end
+router.get('/getListMemberKsv', (req, res) => {
+
+	var psid = req.query.psid;
+	console.log("getListMemberKsv psid: ", psid);
+
+	var query = {
+		_id: psid
+	};
+	console.log("getListMemberKsv query: ", query);
+	objDb.getConnection(function (client) {
+		objDb.findMembers(query, client, function (results) {
+			if (results.length > 0) {
+				results = results[0];
+
+				var queryDetail = {
+					_id: {
+						$ne: psid
+					}
+				}; /////Loại bỏ chính mình ra khỏi danh sách
+				////layerDelegatelayer- Delegate , được ủy quyền để tăng 1 cấp layer
+				if (results.Delegate == null) {
+					results.Delegate = 0;
+				}
+				var layerDelegate = Number(results.Layer) - Number(results.Delegate);
+				if (layerDelegate < 0) {
+					layerDelegate = 0; // chỉ cho Ủy quyền đến cấp admin
+				}
+				console.log("getListMemberKsv layerDelegate: ", layerDelegate);
+				if (results.BlockStatus == "ACTIVE" && results.Layer == results.Level) {
+					console.log("getListMemberDelegate Level : ", results.Level);
+					///// layer+1 + va + ủy quyền để thấy dưới 1 lớp
+					var layer = layerDelegate + 1;
+					//var layer = Number(results.Layer) + 1;
+
+					if (results.Level == 1 || results.Level == 0) {
+						results.Provincial = "";
+						results.District = "";
+						results.Ward = "";
+
+					}
+					///// Lấy ra thành viên cùng lớp
+
+					if (results.Level == 1) {
+						////// Lấy cả layer = 1 và layer =2
+						Object.assign(queryDetail, {
+							$or: [{
+								Layer: 2
+							}, {
+								Layer: 1
+							}]
+						});
+					} else {
+						/// Lấy leyer dưới 1 cấp
+						if (results.Layer != undefined && results.Layer != "" && layer != 1 && layer != 0) {
+							Object.assign(queryDetail, {
+								Layer: Number(layer)
+							});
+						}
+					}
+					if (layer != 1 && layer != 0) {
+						if (results.Provincial != "") {
+							Object.assign(queryDetail, {
+								Provincial: results.Provincial
+							});
+						}
+						if (results.District != "") {
+							Object.assign(queryDetail, {
+								District: results.District
+							});
+						}
+						if (results.Ward != "") {
+							Object.assign(queryDetail, {
+								Ward: results.Ward
+							});
+						}
+					}
+					//					Object.assign(queryDetail, {
+					//						BlockStatus: 'ACTIVE'
+					//					});
+					console.log("getListMemberDelegate query detail", queryDetail);
+					objDb.findMembers(queryDetail, client, function (resultsList) {
+						client.close();
+						res.send(resultsList);
+					});
+				} else {
+					client.close();
+					res.send(null);
+				}
+
+
+			} else {
+				client.close();
+				res.send(results);
+			}
+		});
+	});
 });
 
-function receivedMessage(event) {
-	var senderID = event.sender.id;
-	var recipientID = event.recipient.id;
-	var timeOfMessage = event.timestamp;
-	var message = event.message;
-	let response;
-	console.log("Received message for user %d and page %d at %d with message:",
-		senderID, recipientID, timeOfMessage);
-	console.log(JSON.stringify(message));
-	var isEcho = message.is_echo;
-	var messageId = message.mid;
-	var appId = message.app_id;
-	var metadata = message.metadata;
-	// You may get a text or attachment but not both
-	var messageText = message.text;
-	var messageAttachments = message.attachments;
-	var quickReply = message.quick_reply;
-	var msg = "x";
-
-	if (isEcho) {
-		// Just logging message echoes to console
-		console.log("Received echo for message %s and app %d with metadata %s",
-			messageId, appId, metadata);
-		return;
-	} else if (quickReply) {
-		
-		client.sendText(senderID, 'Hello! quickReply', { tag: 'ISSUE_RESOLUTION' });
-	
-	}else if (messageText) {
-		switch (messageText.toLowerCase()) {
-			case 'giá xe':
-				client.sendMessage(senderID, {  text: 'Hanoi (KV1) -> Noibai: 200k,Noibai -> Hanoi (KV1): 250k',});
-				client.sendAttachment(senderID, {
-				  type: 'image',
-				  payload: {
-					url: 'https://scontent.fhan3-2.fna.fbcdn.net/v/t1.0-9/31081528_568961726811775_3035050846015455232_n.jpg?_nc_cat=0&oh=275c0f15fc0d56e03fee30afc9bea818&oe=5C060612',
-				  },
-				});
-				break;
-			case 'liên hệ':
-				client.sendMessage(senderID, {  text: 'MKmart hotline: 091.128.5465 / 1900545465!',});
-				break;
-			default:
-			client.sendText(senderID, 'Hello! messageText', { tag: 'ISSUE_RESOLUTION' });
-			break;
-		
+router.get('/logoutCMS', function (req, res) {
+	req.session.destroy();
+	res.send("logout success!");
+});
+//Toanva add loginCMS
+router.post('/loginCMS', function (req, res) {
+	let body = req.body;
+	var bytes = Cryptojs.AES.decrypt(body.data, req.sessionID);
+	var decryptedData = JSON.parse(bytes.toString(Cryptojs.enc.Utf8));
+	if (!decryptedData.UserName || !decryptedData.Password) {
+		console.log("loginCMS failed");
+		res.send('Mật khẩu hoạc tài khoản không đúng');
+	} else {
+		console.log("loginCMS:", decryptedData.UserName);
+		var query = {
+			UserName: decryptedData.UserName,
+			Password: Cryptojs.MD5(decryptedData.Password).toString()
 		}
-
+		objDb.getConnection(function (client) {
+			objDb.findUsers(query, client, function (results) {
+				client.close();
+				if (results !== null && results.length > 0) {
+					console.log("loginCMS success");
+					req.session.user = body.UserName;
+					req.session.admin = true;
+					console.log("session.admin", req.session.admin);
+					req.session.faceUser = true;
+					res.json({
+						success: "true",
+						message: 'Đăng nhập thành công'
+					});
+				} else {
+					console.log("loginCMS failed");
+					res.json({
+						success: "false",
+						message: 'Mật khẩu hoạc tài khoản không đúng'
+					});
+				}
+			});
+		});
 	}
-};
+});
 
+router.get('/getMemberByGroup', (req, res) => {
+	if (req.session == null || req.session.admin == null) {
+		return res.sendStatus(401);
+	}
+	var code = req.query.code;
+	var options = {};
+	var pipeline = [];
+	if (code == "day") {
+		pipeline = [{
+			"$group": {
+				_id: {
+					date: {
+						$dateToString: {
+							format: "%Y-%m-%d",
+							date: "$InsertDate"
+						}
+					}
+				},
+				count: {
+					$sum: 1
+				}
+			}
+		}, {
+			"$sort": {
+				"_id.date": 1
+			}
+		}, {
+			"$project": {
+				"_id": 0,
+				"Date": "$_id.date",
+				"Total": "$count"
+			}
+		}];
+	}
+	console.log("getMemberByGroup", code);
+	objDb.getConnection(function (client) {
+		objDb.findMembersByGroup(pipeline, options, client, function (results) {
+			client.close();
+			res.send(results);
+		});
+	});
+});
 module.exports = router;
