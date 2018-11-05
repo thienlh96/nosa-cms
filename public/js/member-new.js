@@ -52,18 +52,18 @@ level5 = {
     level: '5',
 };
 var objInfo;
+var district = '';
+var provincial = '';
+var ward = '';
+var level = 4;
 function drawTable(objMembers) {
     for (var i = 0; i < objMembers.length; i++) {
         arr = Object.values(objMembers[i]);
-        if (objMembers[i].Ward== null) {
-            var pos = '';
-            Object.keys(arr[2]).forEach(function (k) {
-                pos+= k + " (" + arr[2][k] + ") ,";
-            });
-            datatable.row.add([arr[0], pos, arr[1]]).draw(false);
-        }
-        else
-            datatable.row.add([arr[0], arr[1], arr[2]]).draw(false);
+        var pos = '';
+        Object.keys(arr[2]).forEach(function (k) {
+            pos+= k + " (" + arr[2][k] + ") ,";
+        });
+        datatable.row.add([arr[0], pos, arr[1]]).draw(false);
     }
     datatable.draw();
 }
@@ -71,8 +71,7 @@ function render(level){
     document.getElementById('col1').innerText = level.col1;
     document.getElementById('col2').innerText = level.col2;
     document.getElementById('title').innerText = level.title;
-    col3 = document.getElementById('col3');
-    col3.innerText = level.col3;
+    document.getElementById('col3').innerText = level.col3;
 }
 function LoadCboProvincials() {
     var selectElemRef = document.getElementById("cboProvincial");
@@ -185,6 +184,20 @@ function onCboDistrictsChange(event) {
                 drawTable(data);
             }
         });
+    }else{
+        $.ajax({
+            dataType: "json",
+            url: "/getProvincialCount",
+            data: {
+                Provincial: provincial
+            },
+            success: function (data) {
+                render(level2);
+                datatable.clear();
+                drawTable(data);
+            }
+        });
+        LoadCboWards();
     }
 };
 
@@ -200,7 +213,7 @@ function LoadCboWards(idDistrict) {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Chọn Xã/Phường - Chọn Xã/Phường", "0");
+            var o = new Option("Tất cả- Chọn Xã/Phường", "0");
             $("#cboWards").append(o);
             for (var i = 1, len = objWards.length + 1; i < len; ++i) {
                 var o = new Option(objWards[i - 1].Name, objWards[i - 1]._id);
@@ -234,9 +247,23 @@ function onCboWardsChange(event) {
                 drawTable(data);
             }
         });
+    }else{
+        $.ajax({
+            dataType: "json",
+            url: "/getDistrictCount",
+            data: {
+                District: district
+            },
+            success: function (data) {
+                render(level3);
+                datatable.clear();
+                drawTable(data);
+            }
+        });
+        LoadCboDistricts();
     }
 };
-function LoadWeb(level,provincial,ward,district){
+function LoadWeb(){
     if(level==1){
         LoadCboProvincials();
         $.ajax({
@@ -250,6 +277,11 @@ function LoadWeb(level,provincial,ward,district){
         });
     }
     if(level==2){
+        cboProvincial = document.getElementById("cboProvincial");
+        var o = new Option(provincial, "0");
+        cboProvincial.remove(0);
+        cboProvincial.append(o);
+        cboProvincial.disabled=true;
         $.ajax({
             dataType: "json",
             url: "/getProvincialCount",
@@ -270,10 +302,6 @@ function LoadWeb(level,provincial,ward,district){
                 for (var i = 1, len = objProvincials.length + 1; i < len; ++i) {
                     console.log(objProvincials[i - 1].Name, provincial);
                     if (objProvincials[i - 1].Name == provincial) {
-                        var o = new Option(provincial, objProvincials[i - 1]._id);
-                        cboProvincial.remove(0);
-                        cboProvincial.append(o);
-                        cboProvincial.disabled = true;
                         LoadCboDistricts(objProvincials[i - 1]._id);
                         break;
                     }
@@ -282,10 +310,16 @@ function LoadWeb(level,provincial,ward,district){
         });
     }
     if (level == 3) {
+        var cboProvincial = document.getElementById("cboProvincial");
         var o = new Option(provincial, "0");
         cboProvincial.remove(0);
         cboProvincial.append(o);
         cboProvincial.disabled = true;
+        var cboDistricts = document.getElementById("cboDistricts");
+        o = new Option(district, "0");
+        cboDistricts.remove(0);
+        cboDistricts.append(o);
+        cboDistricts.disabled = true;
         $.ajax({
             dataType: "json",
             url: "/getDistrictCount",
@@ -307,10 +341,6 @@ function LoadWeb(level,provincial,ward,district){
             success: function (data) {
                 for (var i = 1, len = data.length + 1; i < len; ++i) {
                     if (data[i - 1].Name == district) {
-                        o = new Option(district, data[i - 1]._id);
-                        cboDistricts.remove(0);
-                        cboDistricts.append(o);
-                        cboDistricts.disabled = true;
                         LoadCboWards(data[i - 1]._id);
                         break;
                     }
@@ -370,7 +400,11 @@ function LoadWeb(level,provincial,ward,district){
             success: function (data) {
                 render(level5);
                 datatable.clear();
-                drawTable(data);
+                for (var i = 0; i < data.length; i++) {
+                    arr = Object.values(data[i]);
+                    datatable.row.add([arr[0], arr[1], arr[2]]).draw(false);
+                }
+                datatable.draw();
             }
         });
     }
@@ -382,6 +416,10 @@ info = $.ajax({
     dataType: "json",
     data: {},
     success: function (data) {
-        LoadWeb(data.Level,data.Provincial,data.Ward,data.District);
+        level=data.Level;
+        ward=data.Ward;
+        provincial=data.Provincial;
+        district=data.District;
+        LoadWeb();
     }
 });
