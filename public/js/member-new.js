@@ -55,7 +55,7 @@ var objInfo;
 function drawTable(objMembers) {
     for (var i = 0; i < objMembers.length; i++) {
         arr = Object.values(objMembers[i]);
-        if(arr[2]==null){
+        if (objMembers[i].Ward== null) {
             var pos = '';
             Object.keys(arr[2]).forEach(function (k) {
                 pos+= k + " (" + arr[2][k] + ") ,";
