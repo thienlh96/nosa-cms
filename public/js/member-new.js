@@ -114,6 +114,8 @@ function onCboProvincialsChange(event) {
             dataType: "json",
             url: "/getProvincialCount",
             data: {Provincial:name},
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level2);
                 datatable.clear();
@@ -126,6 +128,8 @@ function onCboProvincialsChange(event) {
             dataType: "json",
             url: "/getCountryCount",
             data: {},
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level1);
                 datatable.clear();
@@ -178,6 +182,8 @@ function onCboDistrictsChange(event) {
             data: {
                 District: name
             },
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level3);
                 datatable.clear();
@@ -191,6 +197,8 @@ function onCboDistrictsChange(event) {
             data: {
                 Provincial: provincial
             },
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level2);
                 datatable.clear();
@@ -241,6 +249,8 @@ function onCboWardsChange(event) {
             data: {
                 Ward: name
             },
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level4);
                 datatable.clear();
@@ -254,6 +264,8 @@ function onCboWardsChange(event) {
             data: {
                 District: district
             },
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level3);
                 datatable.clear();
@@ -269,6 +281,8 @@ function LoadWeb(){
         $.ajax({
             dataType: "json",
             url: "/getCountrycount",
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level1);
                 datatable.clear();
@@ -288,6 +302,8 @@ function LoadWeb(){
             data: {
                 Provincial: provincial
             },
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level2);
                 datatable.clear();
@@ -326,6 +342,8 @@ function LoadWeb(){
             data: {
                 District: district
             },
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level3);
                 datatable.clear();
@@ -369,6 +387,8 @@ function LoadWeb(){
             data: {
                 Ward: ward
             },
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level4);
                 datatable.clear();
@@ -397,6 +417,8 @@ function LoadWeb(){
             data: {
                 Ward: ward
             },
+            beforeSend: loadStart,
+            complete: loadStop,
             success: function (data) {
                 render(level5);
                 datatable.clear();
@@ -423,3 +445,12 @@ info = $.ajax({
         LoadWeb();
     }
 });
+function loadStart() {
+    $('#loading').show();
+    $('#grvResult').hide();
+}
+
+function loadStop() {
+    $('#loading').hide();
+    $('#grvResult').show();
+}
