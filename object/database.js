@@ -1095,7 +1095,7 @@ module.exports = {
     updateMemberOtp: function (objBtcOtp, client, callback) {
     	// Get the Users collection
     	const db = client.db(DATA_BASE_NAME);
-    	const collection = db.collection('BtcOtp');
+    	const collection = db.collection('MemberOTP');
     	var objUserUpdate = {
     		$set: {
     			"BlockStatus": "ACTIVE"

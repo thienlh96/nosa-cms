@@ -96,6 +96,7 @@ router.post('/unitloginCMS', function (req, res) {
 					objBtcOtp.psid = decryptedData.psid;
 					objBtcOtp.OTP = decryptedData.OTP;
 					objDb.updateMemberOtp(objBtcOtp, client, function (results) {
+						console.log(results);
 						client.close();
 					});
 					req.session.Name = results.Name;
