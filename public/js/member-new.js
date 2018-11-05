@@ -1,88 +1,79 @@
-//https://nongsanvn.herokuapp.com/getMemberCMS
-var idatadetail = null;
+//https://nongsanvn.herokuapp.com/getProductCMS
 var cboProvincial = document.getElementById("cboProvincial");
-var cboPosition = document.getElementById("cboPosition");
 var cboDistricts = document.getElementById("cboDistricts");
 var cboWards = document.getElementById("cboWards");
-var cboStatus = document.getElementById("cboStatus");
-
-function cboLevelChange(event) {
-    var value = event.value;
-    if (value == '1') {
-        setDataPosition(arrPosition[0], arrLayer[0]);
-    } else if (value == '2') {
-        setDataPosition(arrPosition[1], arrLayer[1]);
-    } else if (value == '3') {
-        setDataPosition(arrPosition[2], arrLayer[2]);
-    } else if (value == '4') {
-        setDataPosition(arrPosition[3], arrLayer[3]);
-    } else {
-        setDataPosition(arrPosition[4], arrLayer[4]);
-    }
-    /// xử lý chức danh kiêm nhiệm
-    var valuePosition = cboPosition[cboPosition.selectedIndex].text;
-};
-
-function setDataPosition(position, layer) {
-    while (cboPosition.length > 0) {
-        cboPosition.remove(0);
-    }
-    var o = new Option("Tất cả", "0");
-    //o.selected=true;
-    $("#cboPosition").append(o);
-    for (var i = 0, len = position.length; i < len; ++i) {
-        var o = new Option(position[i], layer[i]);
-        $("#cboPosition").append(o);
-    }
-    var value = cboPosition[cboPosition.selectedIndex].text;
-    var valueLevel = cboLevel[cboLevel.selectedIndex].value;
-};
-
-function loadPosition() {
-    var position1 = [];
-    var arrLayer1 = [];
-    var position2 = [];
-    var arrLayer2 = [];
-    var position3 = [];
-    var arrLayer3 = [];
-    var position4 = [];
-    var arrLayer4 = [];
-    var position5 = [];
-    var arrLayer5 = [];
-    var objPosition;
-    $.ajax({
-        dataType: "json",
-        url: "/getPosition",
-        data: objPosition,
-        success: function (data) {
-            objPosition = data;
-            for (var i = 0, len = objPosition.length; i < len; ++i) {
-                var value = objPosition[i].Level;
-                if (value == '1') {
-                    position1.push(objPosition[i].Name);
-                    arrLayer1.push(objPosition[i].Layer);
-                } else if (value == '2') {
-                    position2.push(objPosition[i].Name);
-                    arrLayer2.push(objPosition[i].Layer);
-                } else if (value == '3') {
-                    position3.push(objPosition[i].Name);
-                    arrLayer3.push(objPosition[i].Layer);
-                } else if (value == '4') {
-                    position4.push(objPosition[i].Name);
-                    arrLayer4.push(objPosition[i].Layer);
-                } else {
-                    position5.push(objPosition[i].Name);
-                    arrLayer5.push(objPosition[i].Layer);
-                }
-            }
-            arrPosition = [position1, position2, position3, position4, position5];
-            arrLayer = [arrLayer1, arrLayer2, arrLayer3, arrLayer4, arrLayer5];
-            setDataPosition(arrPosition[0], arrLayer[0]);
+var datatable = $('#grvResult').DataTable({
+    scrollY: 400,
+    scrollX: true,
+    scrollCollapse: true,
+    select: true,
+    dom: 'Bfrtip',
+    buttons: [{
+            extend: 'excelHtml5',
+        },
+        {
+            extend: 'pdfHtml5',
         }
-    });
+    ],
+});
+level1 = {
+    title: 'Danh sách 63 tỉnh thành và 4 đơn vị tương đương',
+    col1: 'TW và Tỉnh - Đơn vị tương đương',
+    col2: 'Chức danh',
+    col3: 'Số lượng người điểm danh',
+    level: '1',
 };
-loadPosition();
-
+level2 = {
+    title: 'Danh sách các huyện và đơn vị tương đương',
+    col1: 'Tỉnh và Huyện - Đơn vị tương đương',
+    col2: 'Chức danh',
+    col3: 'Số lượng người điểm danh',
+    level: '2',
+};
+level3 = {
+    title: 'Danh sách xã và đơn vị tương đương',
+    col1: 'Huyện và xã - Đơn vị tương đương',
+    col2: 'Chức danh',
+    col3: 'Số lượng người điểm danh',
+    level: '3',
+};
+level4 = {
+    title: 'Danh sách các tổ ,thôn và đơn vị tương đương',
+    col1: 'Xã ,tổ và thôn - Đơn vị tương đương',
+    col2: 'Chức danh',
+    col3: 'Số lượng người điểm danh',
+    level: '4',
+};
+level5 = {
+    title: 'Danh sách điểm danh',
+    col1: 'Họ và tên',
+    col2: 'Chức danh',
+    col3: 'Xã',
+    level: '5',
+};
+var objInfo;
+function drawTable(objMembers) {
+    for (var i = 0; i < objMembers.length; i++) {
+        arr = Object.values(objMembers[i]);
+        if(arr[2]==null){
+            var pos = '';
+            Object.keys(arr[2]).forEach(function (k) {
+                pos+= k + " (" + arr[2][k] + ") ,";
+            });
+            datatable.row.add([arr[0], pos, arr[1]]).draw(false);
+        }
+        else
+            datatable.row.add([arr[0], arr[1], arr[2]]).draw(false);
+    }
+    datatable.draw();
+}
+function render(level){
+    document.getElementById('col1').innerText = level.col1;
+    document.getElementById('col2').innerText = level.col2;
+    document.getElementById('title').innerText = level.title;
+    col3 = document.getElementById('col3');
+    col3.innerText = level.col3;
+}
 function LoadCboProvincials() {
     var selectElemRef = document.getElementById("cboProvincial");
     var objProvincials;
@@ -96,7 +87,7 @@ function LoadCboProvincials() {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Chọn Tỉnh/TP", "0");
+            var o = new Option("Tất cả - Chọn Tỉnh/TP", "0");
             //o.selected=true;
             $("#cboProvincial").append(o);
             for (var i = 1, len = objProvincials.length + 1; i < len; ++i) {
@@ -115,12 +106,36 @@ function LoadCboProvincials() {
         }
     });
 };
+
 function onCboProvincialsChange(event) {
     if (event.selectedIndex > 0) {
         var value = event.value;
+        var name = event.options[event.selectedIndex].text;
+        $.ajax({
+            dataType: "json",
+            url: "/getProvincialCount",
+            data: {Provincial:name},
+            success: function (data) {
+                render(level2);
+                datatable.clear();
+                drawTable(data);
+            }
+        });
         LoadCboDistricts(value);
+    }else{
+        $.ajax({
+            dataType: "json",
+            url: "/getCountryCount",
+            data: {},
+            success: function (data) {
+                render(level1);
+                datatable.clear();
+                drawTable(data);
+            }
+        });
     }
 };
+
 function LoadCboDistricts(idProvincial) {
     var selectElemRef = document.getElementById("cboDistricts");
     var objDistricts;
@@ -133,7 +148,7 @@ function LoadCboDistricts(idProvincial) {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Tất cả", "0");
+            var o = new Option("Tất cả - Chọn Quận/Huyện", "0");
             $("#cboDistricts").append(o);
             for (var i = 1, len = objDistricts.length + 1; i < len; ++i) {
                 var o = new Option(objDistricts[i - 1].Name, objDistricts[i - 1]._id);
@@ -152,12 +167,27 @@ function LoadCboDistricts(idProvincial) {
         }
     });
 };
+
 function onCboDistrictsChange(event) {
     if (event.selectedIndex > 0) {
         var value = event.value;
+        name = event.options[event.selectedIndex].text;
         LoadCboWards(value);
+        $.ajax({
+            dataType: "json",
+            url: "/getDistrictCount",
+            data: {
+                District: name
+            },
+            success: function (data) {
+                render(level3);
+                datatable.clear();
+                drawTable(data);
+            }
+        });
     }
 };
+
 function LoadCboWards(idDistrict) {
     var selectElemRef = document.getElementById("cboWards");
     var objWards;
@@ -170,7 +200,7 @@ function LoadCboWards(idDistrict) {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Chọn Xã/Phường", "0");
+            var o = new Option("Chọn Xã/Phường - Chọn Xã/Phường", "0");
             $("#cboWards").append(o);
             for (var i = 1, len = objWards.length + 1; i < len; ++i) {
                 var o = new Option(objWards[i - 1].Name, objWards[i - 1]._id);
@@ -188,245 +218,170 @@ function LoadCboWards(idDistrict) {
         }
     });
 };
-LoadCboProvincials();
-
-var datatable = $('#grvResult').DataTable({
-    scrollY: 400,
-    scrollX: true,
-    scrollCollapse: true,
-    select: true,
-    dom: 'Bfrtip',
-    buttons: [
-        {
-            extend: 'excelHtml5',
-        },
-        {
-            extend: 'pdfHtml5',
-        }
-    ],
-    ajax: {
-        dataType: "json",
-        url: "/getMemberCMS",
-        data: function (d) {
-            var name = "";
-            var provincial = "";
-            var districts = "";
-            var wards = "";
-            var blockstatus = "";
-            var position = "";
-            var layer = "";
-            var level = "";
-            if ($('#txtName').val() != "" && $('#txtName').val() != undefined)
-                name = $("#txtName").val();
-            if (cboProvincial.selectedIndex != 0)
-                provincial = cboProvincial[cboProvincial.selectedIndex].text;
-            if (cboDistricts.selectedIndex != 0)
-                districts = cboDistricts[cboDistricts.selectedIndex].text;
-            if (cboWards.selectedIndex != 0)
-                wards = cboWards[cboWards.selectedIndex].text;
-            if (cboStatus.selectedIndex != 0)
-                blockstatus = cboStatus.value;
-            level = cboLevel.value;
-            if (cboPosition.selectedIndex != 0)
-                position = cboPosition[cboPosition.selectedIndex].text;
-            
-            d.phone = $("#txtPhone").val();
-            d.name = name;
-            d.position = position;
-            d.blockstatus = blockstatus;
-            d.provincial = provincial;
-            d.districts = districts;
-            d.wards = wards;
-            d.level = level;
-            d.layer = "";
-            d.psid = "";
-        },
-        error: function(err) {
-            if (err.responseText == 'Unauthorized') {
-                alert("Bạn đã bị time out");
-                window.location.href = 'login.html';
+function onCboWardsChange(event) {
+    name = event.options[event.selectedIndex].text;
+    if (event.selectedIndex > 0) {
+        var value = event.value;
+        $.ajax({
+            dataType: "json",
+            url: "/getWardCount",
+            data: {
+                Ward: name
+            },
+            success: function (data) {
+                render(level4);
+                datatable.clear();
+                drawTable(data);
             }
-        },
-        dataSrc: ""
-    },
-    columns: [
-        {
-            data: 'ImgUrl', render: function (data, type, row, meta) {
-                return '<img src="' + data + '" height="80" width="80">';
-            }
-        },
-        {
-            data: 'Name', render: function (data, type, row, meta) {
-                return '<a href="#" onclick="ShowDetail(' + row._id + ')">' + data + '</a>';
-            }
-        },
-        {
-            data: 'Birthday', render: function (data, type, row, meta) {
-                return GetBirthDay(row.Birthday);
-            }
-        },
-        { data: 'Position', defaultContent: "" },
-        { data: 'Provincial', defaultContent: "" },
-        { data: 'District', defaultContent: "" },
-        { data: 'Ward', defaultContent: "" },
-        { data: 'Phone', defaultContent: "" },
-        { data: 'Email', defaultContent: "" },
-        {
-            data: 'BlockStatus', render: function (data, type, row, meta) {
-                return data === "ACTIVE" ? "Đã duyệt" : "Chưa duyệt";
-            }
-        }
-    ]
-});
-
-function SearchMember() {
-    datatable.ajax.reload();
-    datatable.draw();
-};
-
-function ShowDetail(id) {
-	tableInfoPending.clear();
-	tableInfoPending.draw();
-	$("#info_name").text('');
-	$("#info_level").text('');
-	$("#info_position").text('');
-	$("#info_birthday").text('');
-	$("#info_phone").text('');
-	$("#info_email").text('');
-	$("#info_address").text('');
-    $("#info_status").text('');
-    $('#info_img').attr('src', '../img/logo.jpg');
-    var imgAvatar = document.getElementById("info_img");
-    var objInfo;
-    $.ajax({
-        dataType: "json",
-        url: "/getMember?psid=" + id,
-        data: objInfo,
-        success: function (data) {
-            objInfo = data[0];
-            imgAvatar.src = objInfo.ImgUrl;
-            var date = new Date(objInfo.Birthday);
-           // var birthday = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
-			var status = objInfo.BlockStatus === "ACTIVE" ? "Đã duyệt":"Chưa duyệt";
-            $("#info_name").text(objInfo.Name);
-            $("#info_level").text(objInfo.LevelName);
-            $("#info_position").text(objInfo.Position);
-            $("#info_birthday").text(objInfo.Birthday);
-            $("#info_phone").text(objInfo.Phone);
-            $("#info_email").text(objInfo.Email);
-            $("#info_address").text(objInfo.Ward + ' - ' + objInfo.District + ' - ' + objInfo.Provincial );
-			$("#info_status").text(status);
-        }
-    });
-    var objMembers;
-    $.ajax({
-        dataType: "json",
-        url: "/getListMemberKsv?psid=" + id,
-        data: objMembers,
-        success: function (data) {
-            objMembers = data;
-            if(data !== null) drawTable(data);
-        }
-    });
-    $('#myModal').modal('show');
-}
-var tableInfoPending = $("#grvInfoPending").DataTable({
-	scrollY: 300,
-    scrollX: true,
-    scrollCollapse: true
-	});
-$('#myModal').on('shown.bs.tab', function(e){
-   $($.fn.dataTable.tables(true)).DataTable()
-      .columns.adjust();
-});
-$('#myModal').on('shown.bs.modal', function(e){
-   $($.fn.dataTable.tables(true)).DataTable()
-      .columns.adjust();
-});
-function drawTable(objMembers) {
-	
-    for (var i = 0; i < objMembers.length; i++) {
-        obj = objMembers[i];
-        if (obj.BlockStatus == 'PENDING') {
-            //var date = new Date(obj.Birthday);
-            //var birthday = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
-			var img = '<img id="img_infodetail" src="' + obj.ImgUrl + '" alt="Ảnh đại diện" class="img-responsive">';
-            var strRow = '';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Họ và Tên:</label><label class="margin0 col-sm-8"> ' + obj.Name + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Cấp cán bộ:</label><label class="margin0 col-sm-8"> ' + obj.LevelName + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Chức vụ:</label><label class="margin0 col-sm-8"> ' + obj.Position + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Ngày sinh:</label><label class="margin0 col-sm-8"> ' + obj.Birthday + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Điện thoại:</label><label class="margin0 col-sm-8"> ' + obj.Phone + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Email:</label><label class="margin0 col-sm-8"> ' + obj.Email + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Địa chỉ :</label><label class="margin0 col-sm-8"> ' + obj.Ward + ' - ' + obj.District + ' - '+ obj.Provincial + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Trạng thái :</label><label class="margin0 col-sm-8"> Chờ duyệt</label></div>';
-            tableInfoPending.row.add([ img, strRow]).draw(false);
-        } 
+        });
     }
-	tableInfoPending.draw();
-	 
 };
-function sendMess(){
-	    var r = confirm("Bạn có muốn gửi tin nhắn đến danh sách thành viên vừa lọc!");
-		if (r == true) 
-		{
-			var name = "";
-			var provincial = "";
-			var districts = "";
-			var wards = "";
-			var blockstatus = "";
-			var position = "";
-			var layer = "";
-			var level = "";
-			if ($('#txtName').val() != "" && $('#txtName').val() != undefined)
-					name = $("#txtName").val();
-			if (cboProvincial.selectedIndex != 0)
-				provincial = cboProvincial[cboProvincial.selectedIndex].text;
-			if (cboDistricts.selectedIndex != 0)
-				districts = cboDistricts[cboDistricts.selectedIndex].text;
-			if (cboWards.selectedIndex != 0)
-				wards = cboWards[cboWards.selectedIndex].text;
-			if (cboStatus.selectedIndex != 0)
-				blockstatus = cboStatus.value;
-			level = cboLevel.value;
-			if (cboPosition.selectedIndex != 0)
-				position = cboPosition[cboPosition.selectedIndex].text;
-
-			if (txtMess.value == undefined || txtMess.value == "") {
-				alert("Bạn phải nhập nội dung tin nhắn");			
-				txtMess.focus();
-				return;
-			};
-			var mess = {};
-			mess.Msg=txtMess.value;
-			mess.phone = $("#txtPhone").val();
-			mess.name = name;
-			mess.provincial=provincial;
-			mess.districts=districts;
-			mess.wards=wards;
-			mess.blockstatus=blockstatus;
-			mess.position=position;
-			mess.level = level;
-			mess.layer = "";
-			//alert(objAi.Id);
-			$.ajax({
-			type: 'POST',
-			data: JSON.stringify(mess),
-			contentType: 'application/json',
-			url: '/sendbroadcast.bot',				
-			success: function(data) 
-					{
-
-						//console.log('success');
-						alert(data.ss);
-						console.log(data);
-
-					},
-				error: function(err) {
-				 if(err.responseText=-'Unauthorized')
-				  alert("Bạn đã bị time out");
-				  window.location.href = 'login.html';
-				}
-		   });
-		}
+function LoadWeb(level,provincial,ward,district){
+    if(level==1){
+        LoadCboProvincials();
+        $.ajax({
+            dataType: "json",
+            url: "/getCountrycount",
+            success: function (data) {
+                render(level1);
+                datatable.clear();
+                drawTable(data);
+            }
+        });
+    }
+    if(level==2){
+        $.ajax({
+            dataType: "json",
+            url: "/getProvincialCount",
+            data: {
+                Provincial: provincial
+            },
+            success: function (data) {
+                render(level2);
+                datatable.clear();
+                drawTable(data);
+            }
+        });
+        $.ajax({
+            dataType: "json",
+            url: "/getProvincial",
+            success: function (data) {
+                objProvincials=data;
+                for (var i = 1, len = objProvincials.length + 1; i < len; ++i) {
+                    console.log(objProvincials[i - 1].Name, provincial);
+                    if (objProvincials[i - 1].Name == provincial) {
+                        var o = new Option(provincial, objProvincials[i - 1]._id);
+                        cboProvincial.remove(0);
+                        cboProvincial.append(o);
+                        cboProvincial.disabled = true;
+                        LoadCboDistricts(objProvincials[i - 1]._id);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+    if (level == 3) {
+        var o = new Option(provincial, "0");
+        cboProvincial.remove(0);
+        cboProvincial.append(o);
+        cboProvincial.disabled = true;
+        $.ajax({
+            dataType: "json",
+            url: "/getDistrictCount",
+            data: {
+                District: district
+            },
+            success: function (data) {
+                render(level3);
+                datatable.clear();
+                drawTable(data);
+            }
+        });
+        $.ajax({
+            dataType: "json",
+            url: "/getDistrict",
+            data: {
+                idProvincial: 'ALL'
+            },
+            success: function (data) {
+                for (var i = 1, len = data.length + 1; i < len; ++i) {
+                    if (data[i - 1].Name == district) {
+                        o = new Option(district, data[i - 1]._id);
+                        cboDistricts.remove(0);
+                        cboDistricts.append(o);
+                        cboDistricts.disabled = true;
+                        LoadCboWards(data[i - 1]._id);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+    if (level == 4) {
+        cboProvincial = document.getElementById("cboProvincial");
+        var o = new Option(provincial, "0");
+        cboProvincial.remove(0);
+        cboProvincial.append(o);
+        cboProvincial.disabled = true;
+        cboDistricts = document.getElementById("cboDistricts");
+        o = new Option(district, "0");
+        cboDistricts.remove(0);
+        cboDistricts.append(o);
+        cboDistricts.disabled = true;
+        o = new Option(ward, "0");
+        cboWards.remove(0);
+        cboWards.append(o);
+        cboWards.disabled = true;
+        $.ajax({
+            dataType: "json",
+            url: "/getWardCount",
+            data: {
+                Ward: ward
+            },
+            success: function (data) {
+                render(level4);
+                datatable.clear();
+                drawTable(data);
+            }
+        });
+    }
+    if (level == 5) {
+        cboProvincial = document.getElementById("cboProvincial");
+        var o = new Option(provincial, "0");
+        cboProvincial.remove(0);
+        cboProvincial.append(o);
+        cboProvincial.disabled = true;
+        cboDistricts = document.getElementById("cboDistricts");
+        o = new Option(district, "0");
+        cboDistricts.remove(0);
+        cboDistricts.append(o);
+        cboDistricts.disabled = true;
+        o = new Option(ward, "0");
+        cboWards.remove(0);
+        cboWards.append(o);
+        cboWards.disabled = true;
+        $.ajax({
+            dataType: "json",
+            url: "/getMemberBranch",
+            data: {
+                Ward: ward
+            },
+            success: function (data) {
+                render(level5);
+                datatable.clear();
+                drawTable(data);
+            }
+        });
+    }
 }
+info = $.ajax({
+    dataType: "json",
+    url: "/Info",
+    type: "GET",
+    dataType: "json",
+    data: {},
+    success: function (data) {
+        LoadWeb(data.Level,data.Provincial,data.Ward,data.District);
+    }
+});

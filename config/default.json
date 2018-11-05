@@ -2,7 +2,7 @@
   "appSecret": "0c7a9ee1c36d3ba8e564bce68fe40d74X",
   "pageAccessToken": "xEAACZB1bEsuo0BAH2xBo21mIXWLrWdYzygXxG2EfjQZBEX5wcDZCZCWNGVBuMlZC2cBqqHCGP1vyq1ZAJoJ4teQj4ar4Dzk8239YMFj7YZCLTXYQCPKUzqhq0RBTOIuVZAhUZC7esnxKzbyr8Q3nLtHxyuNUyvJQrzah5ZCU28627Cf7zTQZDZD",
   "validationToken": "verify-token-mkmart",
-  "serverURL": "https://nosa-cms.herokuapp.com/",
+  "serverURL": "https://nosa-cms.herokuapp.com/", //"http://localhost",
   "mongoUrl": "mongodb://nosavnnet:nsvn6688@nosavn.net:27018/?authMechanism=SCRAM-SHA-1&authSource=Nosa&connectTimeoutMS=30000&maxIdleTimeMS=600000",
-  "databasename": "hksv"
+  "databasename": "Nosa"
 }

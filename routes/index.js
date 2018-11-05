@@ -5,317 +5,276 @@ var Cryptojs = require("crypto-js"); //Toanva add
 var objDb = require('../object/database.js');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+var id='';
+var district='';
+var provincial='';
+var ward='';
+var level=4;
+function creatCond(cond){
+	if(level==2){
+		cond.$and.push({Provincial:provincial});
+	}
+	if(level==3){
+		cond.$and.push({District:district});
+	}
+	if(level==4){
+		cond.$and.push({Ward:ward});
+	}
+	return cond;
+}
+function verifyRequestSignature(req, res, buf) {
+	var signature = req.headers["x-hub-signature"];
 
+	if (!signature) {
+		// For testing, let's log an error. In production, you should throw an 
+		// error.
+		console.error("Couldn't validate the signature.");
+	} else {
+		var elements = signature.split('=');
+		var method = elements[0];
+		var signatureHash = elements[1];
+
+		var expectedHash = crypto.createHmac('sha1', APP_SECRET)
+			.update(buf)
+			.digest('hex');
+
+		if (signatureHash != expectedHash) {
+			throw new Error("Couldn't validate the request signature.");
+		}
+	}
+};
+router.use(session({
+	secret: 'nsvn119',
+	saveUninitialized: true,
+	resave: true,
+	cookie: {
+		expires: new Date(Date.now() + (60 * 1000 * 60))
+	} /// Set time out 1h
+}));
+router.use(bodyParser.urlencoded({
+	extended: false,
+	limit: '10mb',
+	parameterLimit: 10000
+}))
+router.use(bodyParser.json({
+	verify: verifyRequestSignature,
+	limit: '10mb'
+}));
 router.use(bodyParser.json());
-
+var auth = function (req, res, next) {
+	// if (req.session && req.session.admin)
+	// 	return next();
+	// else
+	// 	return res.sendStatus(401);
+	return next();
+};
 /* GET users listing. */
 router.get('/', function (req, res, next) {
 	res.sendFile('login.html', {
 		root: "views/cms"
 	});
 });
-
-router.get('/index.html', function (req, res, next) {
-	res.sendFile('index.html', {
-		root: "views/cms"
+router.get('/view', function (req, res, next) {
+	res.render('report', {
+		'level':'1'
 	});
 });
-
-router.get('/member.html', function (req, res, next) {
-	res.sendFile('member.html', {
-		root: "views/cms"
-	});
-});
-
-router.get('/chart.html', function (req, res, next) {
-	res.sendFile('chart.html', {
-		root: "views/cms"
-	});
-});
-
-//Toanva add getkeyCMS
-router.post('/getkeyCMS', function (req, res) {
-	let body = req.body;
-	if (req.session.cms_key == null) {
-		req.session.cms_key = req.sessionID;
-		res.send(req.sessionID);
-	} else {
-		res.send(req.session.cms_key);
-	}
-});
-//Toanva add getMemberCMS
-router.get('/getMemberCMS', (req, res) => {
-	if (req.session == null || req.session.admin == null) {
-		return res.sendStatus(401);
-	}
-	var name = req.query.name;
-	var psid = req.query.psid;
-	var provincial = req.query.provincial;
-	var districts = req.query.districts;
-	var wards = req.query.wards;
-	var position = req.query.position;
-	var level = req.query.level;
-	var layer = req.query.layer;
-	var blockstatus = req.query.blockstatus;
-	var phone = req.query.phone;
-	if (psid == null || psid == 'all')
-		psid = "";
-	if (name == null || name == 'all')
-		name = "";
-	if (provincial == null || provincial == 'all' || provincial == 'NA')
-		provincial = "";
-	if (districts == null || districts == 'all' || districts == 'NA')
-		districts = "";
-	if (wards == null || wards == 'all' || wards == 'NA')
-		wards = "";
-	if (position == null || position == 'all' || position == 'NA')
-		position = "";
-	if (level == null || level == 'all' || level == 'NA')
-		level = "";
-	if (layer == null || layer == 'all' || layer == 'NA')
-		layer = "";
-	if (blockstatus == null || blockstatus == 'all')
-		blockstatus = "";
-	if (phone == null || phone == 'all')
-		phone = "";
-	var query = {};
-	if (name != "") {
-		name = ".*" + name + ".*";
-		Object.assign(query, {
-			Name: {
-				$regex: name
-			}
-		});
-	}
-	if (psid != "") {
-		Object.assign(query, {
-			_id: psid
-		});
-	}
-	if (blockstatus != "") {
-		Object.assign(query, {
-			BlockStatus: blockstatus
-		});
-	}
-	if (phone != "") {
-		phone = ".*" + phone + ".*";
-		Object.assign(query, {
-			Phone: {
-				$regex: phone
-			}
-		});
-	}
-
-	if (provincial != "") {
-		Object.assign(query, {
-			Provincial: provincial
-		});
-	}
-	if (districts != "") {
-		Object.assign(query, {
-			District: districts
-		});
-	}
-	if (wards != "") {
-		Object.assign(query, {
-			Ward: wards
-		});
-	}
-	if (position != "") {
-		Object.assign(query, {
-			Position: position
-		});
-	}
-	console.log("GetMemberCMS query", query);
+router.get('/login', auth, (req, res) => {
+	id = req.query.id+'';
+	var query={"_id":id};
+	console.log(query);
 	objDb.getConnection(function (client) {
-		objDb.findMembers(query, client, function (results) {
+		objDb.findMember(query, client, function (results) {
 			client.close();
-			res.send(results);
+			if (results !== null) {
+				console.log("loginCMS success");
+				id = results._id;
+				provincial = results.Provincial;
+				district = results.District;
+				ward = results.Ward;
+				level = results.Level;
+				res.render('report', {
+					'level': ''
+				});
+			} else {
+				res.json({
+					success: "false",
+					message: 'Mật khẩu hoạc tài khoản không đúng'
+				});
+			}
 		});
 	});
 });
-//Toanva getMemberCMS end
-router.get('/getListMemberKsv', (req, res) => {
-
-	var psid = req.query.psid;
-	console.log("getListMemberKsv psid: ", psid);
-
-	var query = {
-		_id: psid
-	};
-	console.log("getListMemberKsv query: ", query);
-	objDb.getConnection(function (client) {
-		objDb.findMembers(query, client, function (results) {
-			if (results.length > 0) {
-				results = results[0];
-
-				var queryDetail = {
-					_id: {
-						$ne: psid
-					}
-				}; /////Loại bỏ chính mình ra khỏi danh sách
-				////layerDelegatelayer- Delegate , được ủy quyền để tăng 1 cấp layer
-				if (results.Delegate == null) {
-					results.Delegate = 0;
-				}
-				var layerDelegate = Number(results.Layer) - Number(results.Delegate);
-				if (layerDelegate < 0) {
-					layerDelegate = 0; // chỉ cho Ủy quyền đến cấp admin
-				}
-				console.log("getListMemberKsv layerDelegate: ", layerDelegate);
-				if (results.BlockStatus == "ACTIVE" && results.Layer == results.Level) {
-					console.log("getListMemberDelegate Level : ", results.Level);
-					///// layer+1 + va + ủy quyền để thấy dưới 1 lớp
-					var layer = layerDelegate + 1;
-					//var layer = Number(results.Layer) + 1;
-
-					if (results.Level == 1 || results.Level == 0) {
-						results.Provincial = "";
-						results.District = "";
-						results.Ward = "";
-
-					}
-					///// Lấy ra thành viên cùng lớp
-
-					if (results.Level == 1) {
-						////// Lấy cả layer = 1 và layer =2
-						Object.assign(queryDetail, {
-							$or: [{
-								Layer: 2
-							}, {
-								Layer: 1
-							}]
-						});
-					} else {
-						/// Lấy leyer dưới 1 cấp
-						if (results.Layer != undefined && results.Layer != "" && layer != 1 && layer != 0) {
-							Object.assign(queryDetail, {
-								Layer: Number(layer)
-							});
-						}
-					}
-					if (layer != 1 && layer != 0) {
-						if (results.Provincial != "") {
-							Object.assign(queryDetail, {
-								Provincial: results.Provincial
-							});
-						}
-						if (results.District != "") {
-							Object.assign(queryDetail, {
-								District: results.District
-							});
-						}
-						if (results.Ward != "") {
-							Object.assign(queryDetail, {
-								Ward: results.Ward
-							});
-						}
-					}
-					//					Object.assign(queryDetail, {
-					//						BlockStatus: 'ACTIVE'
-					//					});
-					console.log("getListMemberDelegate query detail", queryDetail);
-					objDb.findMembers(queryDetail, client, function (resultsList) {
-						client.close();
-						res.send(resultsList);
-					});
-				} else {
-					client.close();
-					res.send(null);
-				}
-
-
-			} else {
+router.get('/Info',(req,res) => {
+	res.send({Level:level,Provincial:provincial,District:district,Ward:ward});
+});
+router.get('/getCountryCount', (req, res) => {
+	if(level==1){
+		objDb.getConnection(function (client) {
+			objDb.countMemberGbCountry(client, function (results) {
+				console.log("getCountryCount");
 				client.close();
 				res.send(results);
-			}
-		});
-	});
-});
-
-router.get('/logoutCMS', function (req, res) {
-	req.session.destroy();
-	res.send("logout success!");
-});
-//Toanva add loginCMS
-router.post('/loginCMS', function (req, res) {
-	let body = req.body;
-	var bytes = Cryptojs.AES.decrypt(body.data, req.sessionID);
-	var decryptedData = JSON.parse(bytes.toString(Cryptojs.enc.Utf8));
-	if (!decryptedData.UserName || !decryptedData.Password) {
-		console.log("loginCMS failed");
-		res.send('Mật khẩu hoạc tài khoản không đúng');
-	} else {
-		console.log("loginCMS:", decryptedData.UserName);
-		var query = {
-			UserName: decryptedData.UserName,
-			Password: Cryptojs.MD5(decryptedData.Password).toString()
-		}
-		objDb.getConnection(function (client) {
-			objDb.findUsers(query, client, function (results) {
-				client.close();
-				if (results !== null && results.length > 0) {
-					console.log("loginCMS success");
-					req.session.user = body.UserName;
-					req.session.admin = true;
-					console.log("session.admin", req.session.admin);
-					req.session.faceUser = true;
-					res.json({
-						success: "true",
-						message: 'Đăng nhập thành công'
-					});
-				} else {
-					console.log("loginCMS failed");
-					res.json({
-						success: "false",
-						message: 'Mật khẩu hoạc tài khoản không đúng'
-					});
-				}
 			});
 		});
-	}
+	}else
+		res.json({
+			success: "false",
+			message: 'Bạn không có quyền xem.'
+		});
 });
+router.get('/getProvincialCount', (req, res) =>{
+	if(level<3){
+		var cond=creatCond({$and: [ {$or: [{Level: 3}, {Level: 2}]}]});
+		if(level==1)
+			cond.$and.push({Provincial:req.query.Provincial});
+		objDb.getConnection(function (client) {
+			objDb.countMemberGbProvincial( cond,client, function (results) {
+				console.log("getProvincialCount");
+				client.close();		
+				res.send(results);
 
-router.get('/getMemberByGroup', (req, res) => {
-	if (req.session == null || req.session.admin == null) {
-		return res.sendStatus(401);
-	}
-	var code = req.query.code;
-	var options = {};
-	var pipeline = [];
-	if (code == "day") {
-		pipeline = [{
-			"$group": {
-				_id: {
-					date: {
-						$dateToString: {
-							format: "%Y-%m-%d",
-							date: "$InsertDate"
-						}
-					}
-				},
-				count: {
-					$sum: 1
-				}
-			}
-		}, {
-			"$sort": {
-				"_id.date": 1
-			}
-		}, {
-			"$project": {
-				"_id": 0,
-				"Date": "$_id.date",
-				"Total": "$count"
-			}
-		}];
-	}
-	console.log("getMemberByGroup", code);
+			});
+		});
+	} else
+		res.json({
+			success: "false",
+			message: 'Bạn không có quyền xem.'
+		});
+});
+router.get('/getDistrictCount', (req, res) => {
+	if(level<=3){
+		var cond=creatCond({$and: [ {$or: [{Level: 3}, {Level: 4}]}]});
+		if(level<3)
+			cond.$and.push({District:req.query.District});
+		objDb.getConnection(function (client) {
+			objDb.countMemberGbDistrict( cond,client, function (results) {
+				console.log("getDistrictCount");
+				client.close();
+				res.send(results);
+
+			});
+	});
+	}else
+		res.json({
+			success: "false",
+			message: 'Bạn không có quyền xem.'
+		});
+});
+router.get('/getWardCount', (req, res) => {
+	name = req.query.Ward;
+	if(level<5){
+		var cond=creatCond({$and: [ {$or: [{Level: 4}, {Level: 5}]}]});
+		if(level<4)
+			cond.$and.push({Ward:req.query.Ward});
+		objDb.getConnection(function (client) {
+			objDb.countMemberGbWard(cond, client, function (results) {
+				console.log("getWardCount");
+				client.close();
+				res.send(results);
+
+			});
+		});
+	}else
+		res.json({
+			success: "false",
+			message: 'Bạn không có quyền xem.'
+		});
+});
+router.get('/getMemberBranch', (req, res) => {
 	objDb.getConnection(function (client) {
-		objDb.findMembersByGroup(pipeline, options, client, function (results) {
+		objDb.getMemberBranch(req.query.Ward, client, function (results) {
+			console.log("getMemberBranch");
 			client.close();
 			res.send(results);
 		});
 	});
+});
+router.get('/getProvincial', (req, res) => {
+	var query = {};
+	objDb.getConnection(function (client) {
+		objDb.findProvincial(query, client, function (results) {
+			client.close();
+			res.send(results);
+
+		});
+	});
+});
+router.get('/getProvincialTemp', (req, res) => {
+	var query = {};
+	objDb.getConnection(function (client) {
+		objDb.findProvincialTemp(query, client, function (results) {
+			client.close();
+			res.send(results);
+
+		});
+	});
+});
+router.get('/getDistrict', (req, res) => {
+	var query;
+	if (req.query.idProvincial == 'ALL') {
+		query = {};
+
+	} else {
+		query = {
+			"IdProvince": req.query.idProvincial
+		};
+	}
+	objDb.getConnection(function (client) {
+		objDb.findDistrict(query, client, function (results) {
+			client.close();
+			res.send(results);
+
+		});
+	});
+	//res.send(req.query.idProvincial);
+});
+router.get('/getWards', (req, res) => {
+
+	var query;
+	if (req.query.idDistrict == 'ALL') {
+		query = {};
+
+	} else {
+		query = {
+			"IdDistrict": req.query.idDistrict
+		};
+	}
+	objDb.getConnection(function (client) {
+		objDb.findWards(query, client, function (results) {
+			console.log("getWards");
+			client.close();
+			res.send(results);
+
+		});
+	});
+	//res.send(req.query.idProvincial);
+});
+router.get('/getBranch', (req, res) => {
+	var query;
+	if (req.query.idWards == 'ALL') {
+		query = {};
+
+	} else {
+		query = {
+			"IdWards": req.query.idWards
+		};
+	}
+	if (req.query.idProvincial != 'ALL' && typeof (req.query.idProvincial) == 'string') {
+		query = {
+			"Name": req.query.idWards
+		};
+
+	}
+	console.log("getBranch query:", query);
+	objDb.getConnection(function (client) {
+		objDb.findBranch(query, client, function (results) {
+			console.log("getBranch");
+			client.close();
+			res.send(results);
+
+		});
+	});
+	//res.send(req.query.idProvincial);
 });
 module.exports = router;
