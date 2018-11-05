@@ -16,6 +16,26 @@
 </head>
 
 <body class="cm-no-transition cm-1-navbar">
+    <div id="cm-menu">
+        <nav class="cm-navbar cm-navbar-primary">
+            <div class="cm-flex">
+                <div class="cm-logo"></div>
+            </div>
+            <div class="btn btn-primary md-menu-white" data-toggle="cm-menu"></div>
+        </nav>
+        <div id="cm-menu-content">
+            <div id="cm-menu-items-wrapper">
+                <div id="cm-menu-scroller">
+                    <ul class="cm-menu-items">
+                        <li><a href="index.html" class="sf-dashboard">Điều khiển</a></li>
+                        <li><a href="member" class="sf-profile-group">Thành viên</a></li>
+                        <li><a href="mess.html" class="sf-box-out">Gửi tin</a></li>
+                        <li class="active"><a href="report" class="sf-monitor">Thống kê</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
     <header id="cm-header">
         <nav class="cm-navbar cm-navbar-primary">
             <div class="btn btn-primary md-menu-white hidden-md hidden-lg" data-toggle="cm-menu"></div>
@@ -65,13 +85,6 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" id='title'></div>
                         <div class="panel-body">
-                            <!-- <select id='cbLevel' onchange="loadLevel()" class="form-control" value=<%=level%>>
-                                <option value="1">Toàn Quốc</option>
-                                <option value="2">Cấp thành phố</option>
-                                <option value="3">Cấp huyện</option>
-                                <option value="4">Cấp xã</option>
-                                <option value="5">Cấp thôn</option>
-                            </select> -->
                             <center id='loading'>
                                 <img src="/img/Spinner-1s-200px.gif"  alt="Loading">
                                 <p>Waiting data...</p>
@@ -115,7 +128,7 @@
     <script src="assets/js/bootstrap.min.js"></script>
     <script src="assets/js/clearmin.min.js"></script>
     <script src="assets/js/toanva.js"></script>
-    <script src="../js/member-new.js?v1.1.1.5"></script>
+    <script src="../js/report.js?v1.1.1.5"></script>
 </body>
 
 </html>

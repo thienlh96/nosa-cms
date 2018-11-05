@@ -1080,6 +1080,36 @@ module.exports = {
 				}
 			});
 		});
-	}
-
+	},
+	findMemberOTP: function(query, client, callback){
+		const db = client.db(DATA_BASE_NAME);
+		const collection = db.collection('MemberOTP');
+		collection.findOne(query, function (err, result) {
+			if (err)
+				callback(err);
+			else
+				callback(result);	
+							
+		});
+	},
+    updateMemberOtp: function (objBtcOtp, client, callback) {
+    	// Get the Users collection
+    	const db = client.db(DATA_BASE_NAME);
+    	const collection = db.collection('BtcOtp');
+    	var objUserUpdate = {
+    		$set: {
+    			"BlockStatus": "ACTIVE"
+    		}
+    	};
+    	collection.updateOne({
+    		'_id': objBtcOtp.psid,
+    		'OTP': Number(objBtcOtp.OTP)
+    	}, objUserUpdate, function (err, res) {
+    		//neu xay ra loi
+    		if (err) throw err;
+    		//neu khong co loi
+    		console.log("updateBtcOtp BlockStatus: ACTIVE success");
+    		callback(null, res);
+    	});
+    },
 }
