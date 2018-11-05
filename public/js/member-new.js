@@ -123,7 +123,7 @@ function onCboProvincialsChange(event) {
             }
         });
         LoadCboDistricts(value);
-    }else{
+    }else{       
         $.ajax({
             dataType: "json",
             url: "/getCountryCount",
@@ -136,6 +136,8 @@ function onCboProvincialsChange(event) {
                 drawTable(data);
             }
         });
+        cboDistricts.innerHTML = '<option value="0">Tất cả - Chọn Quận/Huyện</option>';
+        cboWards.innerHTML = '<option value="0">Tất cả - Chọn Xã/Phường</option>';
     }
 };
 
@@ -205,7 +207,7 @@ function onCboDistrictsChange(event) {
                 drawTable(data);
             }
         });
-        LoadCboWards();
+        cboWards.innerHTML = '<option value="0">Tất cả - Chọn Xã/Phường</option>';
     }
 };
 
@@ -272,7 +274,6 @@ function onCboWardsChange(event) {
                 drawTable(data);
             }
         });
-        LoadCboDistricts();
     }
 };
 function LoadWeb(){
