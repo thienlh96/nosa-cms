@@ -188,42 +188,42 @@ function LoadCboWards(idDistrict) {
     });
 };
 LoadCboProvincials();
-info = $.ajax({
-    dataType: "json",
-    url: "/Info",
-    type: "GET",
-    dataType: "json",
-    data: {},
-    success: function (data) {
-        level = data.Level;
-        ward = data.Ward;
-        provincial = data.Provincial;
-        district = data.District;
-        i = 1;
-        while (level > i) {
-            cboLevel.remove(i);
-            i++;
-        }
-        if (level > 1) {
-            cboProvincial.remove();
-            var o = new Option(provincial, provincial);
-            cboProvincial.append(o);
-            cboProvincial.disabled = true;
-        }
-        if (level > 2) {
-            cboDistricts.remove();
-            var o = new Option(district, district);
-            cboDistricts.append(o);
-            cboDistricts.disabled = true;
-        }
-        if (level > 3) {
-            cboWards.remove();
-            var o = new Option(ward, ward);
-            cboWards.append(o);
-            cboWards.disabled = true;
-        }
-    }
-});
+// info = $.ajax({
+//     dataType: "json",
+//     url: "/Info",
+//     type: "GET",
+//     dataType: "json",
+//     data: {},
+//     success: function (data) {
+//         level = data.Level;
+//         ward = data.Ward;
+//         provincial = data.Provincial;
+//         district = data.District;
+//         i = 1;
+//         while (level > i) {
+//             cboLevel.remove(i);
+//             i++;
+//         }
+//         if (level > 1) {
+//             cboProvincial.remove(0);
+//             var o = new Option(provincial, provincial);
+//             cboProvincial.append(o);
+//             cboProvincial.disabled = true;
+//         }
+//         if (level > 2) {
+//             cboDistricts.remove(0);
+//             var o = new Option(district, district);
+//             cboDistricts.append(o);
+//             cboDistricts.disabled = true;
+//         }
+//         if (level > 3) {
+//             cboWards.remove(0);
+//             var o = new Option(ward, ward);
+//             cboWards.append(o);
+//             cboWards.disabled = true;
+//         }
+//     }
+// });
 var datatable = $('#grvResult').DataTable({
     scrollY: 400,
     scrollX: true,
