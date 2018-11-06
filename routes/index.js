@@ -56,7 +56,12 @@ var authKsv = function (req, res, next) {
 		return res.sendStatus(401);
 };
 router.get('/', function (req, res, next) {
-	res.sendFile('login.html', {
+	res.sendFile('member.html', {
+		root: "views/cms"
+	});
+});
+router.get('/mess', function (req, res, next) {
+	res.sendFile('mess.html', {
 		root: "views/cms"
 	});
 });
@@ -942,5 +947,28 @@ router.get('/getKycMembers', authKsv, (req, res) => {
 
 		});
 	});
+});
+server.post('/sendbroadcast.bot', auth, (req, res) => {
+	let body = req.body;
+
+
+	var msg = body.Msg;
+	//console.log("strQuestion: ",strQuestion);	
+	var query = {};
+	var mess = {};
+	objDb.getConnection(function (client) {
+		objDb.findMembers(query, client, function (results) {
+			//	   res.send(results);
+			//console.log(results);
+			console.log('Total Broadcast send: ', results.length);
+			client.close();
+			for (var i = 0; i < results.length; i++) {
+				sendTextMessage(results[i]._id, msg)
+			}
+			mess.ss = "Gửi thành công " + results.length + " tin";
+		});
+	});
+	res.send(mess);
+
 });
 module.exports = router;

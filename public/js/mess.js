@@ -187,14 +187,12 @@ function LoadCboWards(idDistrict) {
         }
     });
 };
-LoadCboProvincials();
 function sendMess(){
 	
 		var name = "";
 		var provincial = "";
 		var districts = "";
 		var wards = "";
-		var blockstatus = "";
 		var position = "";
 		var layer = "";
 		var level = "";
@@ -206,8 +204,6 @@ function sendMess(){
 			districts = cboDistricts[cboDistricts.selectedIndex].text;
 		if (cboWards.selectedIndex != 0)
 			wards = cboWards[cboWards.selectedIndex].text;
-		if (cboStatus.selectedIndex != 0)
-			blockstatus = cboStatus.value;
 		level = cboLevel.value;
 		if (cboPosition.selectedIndex != 0)
 			position = cboPosition[cboPosition.selectedIndex].text;
@@ -252,3 +248,103 @@ function sendMess(){
 	
 	
 }
+info = $.ajax({
+    dataType: "json",
+    url: "/Info",
+    type: "GET",
+    dataType: "json",
+    data: {},
+    success: function (data) {
+        level = data.Level;
+        ward = data.Ward;
+        provincial = data.Provincial;
+        district = data.District;
+        i = 1;
+        while (level > i) {
+            cboLevel.remove(i - 1);
+            i++;
+        }
+        if (level == 1) {
+            LoadCboProvincials();
+        }
+        if (level == 2) {
+            var o = new Option(provincial, provincial);
+            cboProvincial.innerHTML = '<option value="0"></option>';
+            cboProvincial.append(o);
+            cboProvincial.disabled = true;
+            cboProvincial.selectedIndex = 1;
+            $.ajax({
+                dataType: "json",
+                url: "/getProvincial",
+                success: function (data) {
+                    objProvincials = data;
+                    for (var i = 1, len = objProvincials.length + 1; i < len; ++i) {
+                        console.log(objProvincials[i - 1].Name, provincial);
+                        if (objProvincials[i - 1].Name == provincial) {
+                            LoadCboDistricts(objProvincials[i - 1]._id);
+                            break;
+                        }
+                    }
+                }
+            });
+        }
+        if (level == 3) {
+            var o = new Option(provincial, provincial);
+            cboProvincial.innerHTML = '<option value="0"></option>';
+            cboProvincial.append(o);
+            cboProvincial.disabled = true;
+            cboProvincial.selectedIndex = 1;
+            o = new Option(district, district);
+            cboDistricts.innerHTML = '<option value="0"></option>';
+            cboDistricts.append(o);
+            cboDistricts.disabled = true;
+            cboDistricts.selectedIndex = 1;
+            $.ajax({
+                dataType: "json",
+                url: "/getDistrict",
+                data: {
+                    idProvincial: 'ALL'
+                },
+                success: function (data) {
+                    for (var i = 1, len = data.length + 1; i < len; ++i) {
+                        if (data[i - 1].Name == district) {
+                            LoadCboWards(data[i - 1]._id);
+                            break;
+                        }
+                    }
+                }
+            });
+        }
+        if (level == 4) {
+            var o = new Option(provincial, provincial);
+            cboProvincial.innerHTML = '<option value="0"></option>';
+            cboProvincial.append(o);
+            cboProvincial.disabled = true;
+            cboProvincial.selectedIndex = 1;
+            o = new Option(district, district);
+            cboDistricts.innerHTML = '<option value="0"></option>';
+            cboDistricts.append(o);
+            cboDistricts.disabled = true;
+            cboDistricts.selectedIndex = 1;
+            var o = new Option(ward, ward);
+            cboWards.innerHTML = '<option value="0"></option>';
+            cboWards.append(o);
+            cboWards.disabled = true;
+            cboWards.selectedIndex = 1;
+            $.ajax({
+                dataType: "json",
+                url: "/getWardCount",
+                data: {
+                    Ward: ward
+                },
+                beforeSend: loadStart,
+                complete: loadStop,
+                success: function (data) {
+                    render(level4);
+                    datatable.clear();
+                    drawTable(data);
+                }
+            });
+        }
+    }
+});
