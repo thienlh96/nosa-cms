@@ -96,7 +96,6 @@ router.post('/unitloginCMS', function (req, res) {
 					objBtcOtp.psid = decryptedData.psid;
 					objBtcOtp.OTP = decryptedData.OTP;
 					objDb.updateMemberOtp(objBtcOtp, client, function (results) {
-						console.log(results);
 						client.close();
 					});
 					req.session.Name = results.Name;
@@ -198,7 +197,6 @@ router.get('/getWardCount', (req, res) => {
 	if (req.session == null) {
 		return res.sendStatus(401);
 	}
-	name = req.query.Ward;
 	if(req.session.Level<5){
 		var cond=creatCond({$and: [ {$or: [{Level: 4}, {Level: 5}]}]},req);
 		if(req.session.Level<4)
@@ -208,7 +206,6 @@ router.get('/getWardCount', (req, res) => {
 				console.log("getWardCount");
 				client.close();
 				res.send(results);
-
 			});
 		});
 	}else
@@ -259,6 +256,11 @@ router.get('/getDistrict', (req, res) => {
 			"IdProvince": req.query.idProvincial
 		};
 	}
+	if (req.query.Name!=null){
+		query = {
+			"Name": req.query.Name,
+		};
+	}
 	objDb.getConnection(function (client) {
 		objDb.findDistrict(query, client, function (results) {
 			client.close();
@@ -277,6 +279,11 @@ router.get('/getWards', (req, res) => {
 	} else {
 		query = {
 			"IdDistrict": req.query.idDistrict
+		};
+	}
+	if (req.query.Name != null) {
+		query = {
+			"Name": req.query.Name,
 		};
 	}
 	objDb.getConnection(function (client) {
@@ -299,11 +306,10 @@ router.get('/getBranch', (req, res) => {
 			"IdWards": req.query.idWards
 		};
 	}
-	if (req.query.idProvincial != 'ALL' && typeof (req.query.idProvincial) == 'string') {
+	if (req.query.Name != null) {
 		query = {
-			"Name": req.query.idWards
+			"Name": req.query.Name,
 		};
-
 	}
 	console.log("getBranch query:", query);
 	objDb.getConnection(function (client) {

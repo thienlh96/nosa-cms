@@ -4,7 +4,6 @@ var cboProvincial = document.getElementById("cboProvincial");
 var cboPosition = document.getElementById("cboPosition");
 var cboDistricts = document.getElementById("cboDistricts");
 var cboWards = document.getElementById("cboWards");
-var cboStatus = document.getElementById("cboStatus");
 
 function cboLevelChange(event) {
     var value = event.value;
@@ -189,7 +188,42 @@ function LoadCboWards(idDistrict) {
     });
 };
 LoadCboProvincials();
-
+info = $.ajax({
+    dataType: "json",
+    url: "/Info",
+    type: "GET",
+    dataType: "json",
+    data: {},
+    success: function (data) {
+        level = data.Level;
+        ward = data.Ward;
+        provincial = data.Provincial;
+        district = data.District;
+        i = 1;
+        while (level > i) {
+            cboLevel.remove(i);
+            i++;
+        }
+        if (level > 1) {
+            cboProvincial.remove();
+            var o = new Option(provincial, provincial);
+            cboProvincial.append(o);
+            cboProvincial.disabled = true;
+        }
+        if (level > 2) {
+            cboDistricts.remove();
+            var o = new Option(district, district);
+            cboDistricts.append(o);
+            cboDistricts.disabled = true;
+        }
+        if (level > 3) {
+            cboWards.remove();
+            var o = new Option(ward, ward);
+            cboWards.append(o);
+            cboWards.disabled = true;
+        }
+    }
+});
 var datatable = $('#grvResult').DataTable({
     scrollY: 400,
     scrollX: true,
@@ -207,6 +241,8 @@ var datatable = $('#grvResult').DataTable({
     ajax: {
         dataType: "json",
         url: "/getMemberCMS",
+        beforeSend: loadStart,
+        complete: loadStop,
         data: function (d) {
             var name = "";
             var provincial = "";
@@ -224,8 +260,6 @@ var datatable = $('#grvResult').DataTable({
                 districts = cboDistricts[cboDistricts.selectedIndex].text;
             if (cboWards.selectedIndex != 0)
                 wards = cboWards[cboWards.selectedIndex].text;
-            if (cboStatus.selectedIndex != 0)
-                blockstatus = cboStatus.value;
             level = cboLevel.value;
             if (cboPosition.selectedIndex != 0)
                 position = cboPosition[cboPosition.selectedIndex].text;
@@ -386,8 +420,6 @@ function sendMess(){
 				districts = cboDistricts[cboDistricts.selectedIndex].text;
 			if (cboWards.selectedIndex != 0)
 				wards = cboWards[cboWards.selectedIndex].text;
-			if (cboStatus.selectedIndex != 0)
-				blockstatus = cboStatus.value;
 			level = cboLevel.value;
 			if (cboPosition.selectedIndex != 0)
 				position = cboPosition[cboPosition.selectedIndex].text;
@@ -429,4 +461,15 @@ function sendMess(){
 				}
 		   });
 		}
+}
+
+
+function loadStart() {
+    $('#loading').show();
+    $('#col-sm-12').hide();
+}
+
+function loadStop() {
+    $('#loading').hide();
+    $('#col-sm-12').show();
 }
