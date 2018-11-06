@@ -256,11 +256,7 @@ router.get('/getDistrict', (req, res) => {
 			"IdProvince": req.query.idProvincial
 		};
 	}
-	if (req.query.Name!=null){
-		query = {
-			"Name": req.query.Name,
-		};
-	}
+	console.log(query);
 	objDb.getConnection(function (client) {
 		objDb.findDistrict(query, client, function (results) {
 			client.close();
@@ -281,11 +277,6 @@ router.get('/getWards', (req, res) => {
 			"IdDistrict": req.query.idDistrict
 		};
 	}
-	if (req.query.Name != null) {
-		query = {
-			"Name": req.query.Name,
-		};
-	}
 	objDb.getConnection(function (client) {
 		objDb.findWards(query, client, function (results) {
 			console.log("getWards");
@@ -304,11 +295,6 @@ router.get('/getBranch', (req, res) => {
 	} else {
 		query = {
 			"IdWards": req.query.idWards
-		};
-	}
-	if (req.query.Name != null) {
-		query = {
-			"Name": req.query.Name,
 		};
 	}
 	console.log("getBranch query:", query);
