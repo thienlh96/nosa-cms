@@ -4,7 +4,7 @@ var cboProvincial = document.getElementById("cboProvincial");
 var cboPosition = document.getElementById("cboPosition");
 var cboDistricts = document.getElementById("cboDistricts");
 var cboWards = document.getElementById("cboWards");
-var cboStatus = document.getElementById("cboStatus");
+var cboLevel = document.getElementById("cboLevel");
 function cboLevelChange(event) {
     var value = event.value;
     if (value == '1') {
@@ -260,11 +260,13 @@ info = $.ajax({
         district = data.District;
         i = 1;
         while (level > i) {
-            cboLevel.remove(i - 1);
+            cboLevel.remove(0);
             i++;
         }
         if (level == 1) {
             LoadCboProvincials();
+        }else{
+            cboLevel.remove(cboLevel.options.length-1);
         }
         if (level == 2) {
             var o = new Option(provincial, provincial);
@@ -314,7 +316,7 @@ info = $.ajax({
                 }
             });
         }
-        if (level == 4) {
+        if (level >= 4) {
             var o = new Option(provincial, provincial);
             cboProvincial.innerHTML = '<option value="0"></option>';
             cboProvincial.append(o);
@@ -330,20 +332,6 @@ info = $.ajax({
             cboWards.append(o);
             cboWards.disabled = true;
             cboWards.selectedIndex = 1;
-            $.ajax({
-                dataType: "json",
-                url: "/getWardCount",
-                data: {
-                    Ward: ward
-                },
-                beforeSend: loadStart,
-                complete: loadStop,
-                success: function (data) {
-                    render(level4);
-                    datatable.clear();
-                    drawTable(data);
-                }
-            });
         }
     }
 });
