@@ -5,6 +5,7 @@ var Cryptojs = require("crypto-js"); //Toanva add
 var objDb = require('../object/database.js');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const request = require('request');
 function creatCond(cond,req){
 	if (req.session.Level == 2) {
 		cond.$and.push({Provincial:req.session.Provincial});
@@ -55,6 +56,20 @@ var authKsv = function (req, res, next) {
 	else
 		return res.sendStatus(401);
 };
+// App Secret can be retrieved from the App Dashboard
+const APP_SECRET = (process.env.MESSENGER_APP_SECRET) ?
+	process.env.MESSENGER_APP_SECRET :
+	config.get('appSecret');
+
+// Arbitrary value used to validate a webhook
+const VALIDATION_TOKEN = (process.env.MESSENGER_VALIDATION_TOKEN) ?
+	(process.env.MESSENGER_VALIDATION_TOKEN) :
+	config.get('validationToken');
+
+// Generate a page access token for your page from the App Dashboard
+const PAGE_ACCESS_TOKEN = (process.env.MESSENGER_PAGE_ACCESS_TOKEN) ?
+	(process.env.MESSENGER_PAGE_ACCESS_TOKEN) :
+	config.get('pageAccessToken');
 router.get('/', function (req, res, next) {
 	res.sendFile('member.html', {
 		root: "views/cms"
@@ -829,7 +844,6 @@ router.get('/getMemberCMS', auth, (req, res) => {
 		blockstatus = "";
 	if (phone == null || phone == 'all')
 		phone = "";
-	var query = {};
 	if (name != "") {
 		name = ".*" + name + ".*";
 		Object.assign(query, {
@@ -948,22 +962,22 @@ router.get('/getKycMembers', authKsv, (req, res) => {
 		});
 	});
 });
-server.post('/sendbroadcast.bot', auth, (req, res) => {
+router.post('/sendbroadcast.bot', auth, (req, res) => {
 	let body = req.body;
-
-
 	var msg = body.Msg;
-	//console.log("strQuestion: ",strQuestion);	
-	var query = {};
+	if (req.session == null) {
+		return res.sendStatus(401);
+	}
+	var query={};
 	var mess = {};
 	objDb.getConnection(function (client) {
 		objDb.findMembers(query, client, function (results) {
 			//	   res.send(results);
-			//console.log(results);
+			console.log(query, req.query);
 			console.log('Total Broadcast send: ', results.length);
 			client.close();
-			for (var i = 0; i < results.length; i++) {
-				sendTextMessage(results[i]._id, msg)
+			for (var i = 0; i <1; i++) {
+				//sendTextMessage(results[i]._id, msg)
 			}
 			mess.ss = "Gửi thành công " + results.length + " tin";
 		});
@@ -971,4 +985,52 @@ server.post('/sendbroadcast.bot', auth, (req, res) => {
 	res.send(mess);
 
 });
+function sendTextMessage(recipientId, messageText) {
+	var messageData = {
+		recipient: {
+			id: recipientId
+		},
+		message: {
+			text: messageText,
+			metadata: "DEVELOPER_DEFINED_METADATA"
+		}
+	};
+
+	callSendAPI(messageData);
+};
+function callSendAPI(messageData) {
+	///console.log("callSendAPI",request) ;
+
+	//console.log("callSendAPI:",messageData.recipient.id)
+	request({
+			uri: 'https://graph.facebook.com/v3.1/me/messages',
+			qs: {
+				access_token: PAGE_ACCESS_TOKEN
+			},
+			method: 'POST',
+			json: messageData
+
+		},
+		function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+
+
+				var recipientId = body.recipient_id;
+				var messageId = body.message_id;
+				//sendTypingOff(recipientId);
+				if (messageId) {
+					console.log("Successfully sent message with id %s to recipient %s",
+						messageId, recipientId);
+				} else {
+					console.log("Successfully called Send API for recipient %s",
+						recipientId);
+				}
+
+			} else {
+				//console.error("Failed calling Send API", response.statusCode, response.statusMessage, body.error);
+				console.error(response.error);
+			}
+		});
+};
+
 module.exports = router;

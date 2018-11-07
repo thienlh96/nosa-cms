@@ -220,7 +220,6 @@ function sendMess(){
 	    mess.provincial=provincial;
 	    mess.districts=districts;
 		mess.wards=wards;
-		mess.blockstatus=blockstatus;
 		mess.position=position;
 		mess.level = level;
         mess.layer = "";
@@ -238,11 +237,11 @@ function sendMess(){
 					console.log(data);
 					
 				},
-		  	error: function(err) {
-			 if(err.responseText=-'Unauthorized')
-			  alert("Bạn đã bị time out");
-			  window.location.href = 'login.html';
-			}
+        error: function(err) {
+            if(err.responseText=-'Unauthorized')
+                alert("Bạn đã bị time out");
+            window.location.href = 'login.html';
+        }
 	   });
 	
 	

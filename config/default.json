@@ -1,8 +1,8 @@
 {
-  "appSecret": "0c7a9ee1c36d3ba8e564bce68fe40d74X",
-  "pageAccessToken": "xEAACZB1bEsuo0BAH2xBo21mIXWLrWdYzygXxG2EfjQZBEX5wcDZCZCWNGVBuMlZC2cBqqHCGP1vyq1ZAJoJ4teQj4ar4Dzk8239YMFj7YZCLTXYQCPKUzqhq0RBTOIuVZAhUZC7esnxKzbyr8Q3nLtHxyuNUyvJQrzah5ZCU28627Cf7zTQZDZD",
-  "validationToken": "verify-token-mkmart",
-  "serverURL": "https://nosa-cms.herokuapp.com/",//"http://localhost", 
-  "mongoUrl": "mongodb://nsvn:nsvn6688@ds251849.mlab.com:51849/heroku_g41d98gw", //"mongodb://nosavnnet:nsvn6688@nosavn.net:27018/?authMechanism=SCRAM-SHA-1&authSource=Nosa&connectTimeoutMS=30000&maxIdleTimeMS=600000",
+  "appSecret": "3f89307ad0f7ff9b28416ed0c836df68",
+  "pageAccessToken": "EAAbvSU7d21MBALiDOld1sp2oU9x6ZARk5p2688EMWq26bLsy5UHRRZB8SziuQmqNA3fhMmBzArZAed6J0XruzAMpjBlp9jCJZCORdEDPpbwYZBVIJWOU5r1qKddfgN9emZBHBPrBHpGACdUmDeboZB86IZBnoTKJZC0yLkROBWNT4VwZDZD",
+  "validationToken": "verify-token-nsvn",
+  "serverURL": "https://nosa-cms.herokuapp.com/",
+  "mongoUrl": "mongodb://nsvn:nsvn6688@ds251849.mlab.com:51849/heroku_g41d98gw",
   "databasename": "heroku_g41d98gw"
 }
