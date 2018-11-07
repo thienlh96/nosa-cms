@@ -962,75 +962,75 @@ router.get('/getKycMembers', authKsv, (req, res) => {
 		});
 	});
 });
-router.post('/sendbroadcast.bot', auth, (req, res) => {
-	let body = req.body;
-	var msg = body.Msg;
-	if (req.session == null) {
-		return res.sendStatus(401);
-	}
-	var query={};
-	var mess = {};
-	objDb.getConnection(function (client) {
-		objDb.findMembers(query, client, function (results) {
-			//	   res.send(results);
-			console.log(query, req.query);
-			console.log('Total Broadcast send: ', results.length);
-			client.close();
-			for (var i = 0; i <1; i++) {
-				//sendTextMessage(results[i]._id, msg)
-			}
-			mess.ss = "Gửi thành công " + results.length + " tin";
-		});
-	});
-	res.send(mess);
+// router.post('/sendbroadcast.bot', auth, (req, res) => {
+// 	let body = req.body;
+// 	var msg = body.Msg;
+// 	if (req.session == null) {
+// 		return res.sendStatus(401);
+// 	}
+// 	var query={};
+// 	var mess = {};
+// 	objDb.getConnection(function (client) {
+// 		objDb.findMembers(query, client, function (results) {
+// 			//	   res.send(results);
+// 			console.log(query, req.query);
+// 			console.log('Total Broadcast send: ', results.length);
+// 			client.close();
+// 			for (var i = 0; i <1; i++) {
+// 				//sendTextMessage(results[i]._id, msg)
+// 			}
+// 			mess.ss = "Gửi thành công " + results.length + " tin";
+// 		});
+// 	});
+// 	res.send(mess);
 
-});
-function sendTextMessage(recipientId, messageText) {
-	var messageData = {
-		recipient: {
-			id: recipientId
-		},
-		message: {
-			text: messageText,
-			metadata: "DEVELOPER_DEFINED_METADATA"
-		}
-	};
+// });
+// function sendTextMessage(recipientId, messageText) {
+// 	var messageData = {
+// 		recipient: {
+// 			id: recipientId
+// 		},
+// 		message: {
+// 			text: messageText,
+// 			metadata: "DEVELOPER_DEFINED_METADATA"
+// 		}
+// 	};
 
-	callSendAPI(messageData);
-};
-function callSendAPI(messageData) {
-	///console.log("callSendAPI",request) ;
+// 	callSendAPI(messageData);
+// };
+// function callSendAPI(messageData) {
+// 	///console.log("callSendAPI",request) ;
 
-	//console.log("callSendAPI:",messageData.recipient.id)
-	request({
-			uri: 'https://graph.facebook.com/v3.1/me/messages',
-			qs: {
-				access_token: PAGE_ACCESS_TOKEN
-			},
-			method: 'POST',
-			json: messageData
+// 	//console.log("callSendAPI:",messageData.recipient.id)
+// 	request({
+// 			uri: 'https://graph.facebook.com/v3.1/me/messages',
+// 			qs: {
+// 				access_token: PAGE_ACCESS_TOKEN
+// 			},
+// 			method: 'POST',
+// 			json: messageData
 
-		},
-		function (error, response, body) {
-			if (!error && response.statusCode == 200) {
+// 		},
+// 		function (error, response, body) {
+// 			if (!error && response.statusCode == 200) {
 
 
-				var recipientId = body.recipient_id;
-				var messageId = body.message_id;
-				//sendTypingOff(recipientId);
-				if (messageId) {
-					console.log("Successfully sent message with id %s to recipient %s",
-						messageId, recipientId);
-				} else {
-					console.log("Successfully called Send API for recipient %s",
-						recipientId);
-				}
+// 				var recipientId = body.recipient_id;
+// 				var messageId = body.message_id;
+// 				//sendTypingOff(recipientId);
+// 				if (messageId) {
+// 					console.log("Successfully sent message with id %s to recipient %s",
+// 						messageId, recipientId);
+// 				} else {
+// 					console.log("Successfully called Send API for recipient %s",
+// 						recipientId);
+// 				}
 
-			} else {
-				//console.error("Failed calling Send API", response.statusCode, response.statusMessage, body.error);
-				console.error(response.error);
-			}
-		});
-};
+// 			} else {
+// 				//console.error("Failed calling Send API", response.statusCode, response.statusMessage, body.error);
+// 				console.error(response.error);
+// 			}
+// 		});
+// };
 
 module.exports = router;
