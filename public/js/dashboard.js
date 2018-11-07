@@ -4,8 +4,6 @@ var piechartGeoCode;
 var piechartPosition;
 var isComplate=true;
 function onInit(){
-
- piechartBlockStatus = new google.visualization.PieChart(document.getElementById('dvBlockStatus'));
  piechartGeoCode = new google.visualization.PieChart(document.getElementById('dvGeoCode'));
  piechartPosition = new google.visualization.PieChart(document.getElementById('dvPosition'));
  lblTotalUser =  document.getElementById('lblTotalUser');
@@ -21,22 +19,6 @@ function getData(){
 		isComplate=false;
 		
 		var objBlockStatus;		
-		$.ajax({
-		dataType: "json",
-		url: "/getMemberByGroup?code=BlockStatus",
-		data: objBlockStatus,
-		success: function(data) {
-				objBlockStatus=	data;
-				drawBlockStatus(objBlockStatus);
-			 },
-		  	error: function(err) {
-			 if(err.responseText=-'Unauthorized')
-			  alert("Bạn đã bị time out");
-			  window.location.href = 'login.html';
-			}            
-		});
-		
-		
 		var objGeoCode;		
 		$.ajax({
 		dataType: "json",

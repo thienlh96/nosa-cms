@@ -71,7 +71,12 @@ const PAGE_ACCESS_TOKEN = (process.env.MESSENGER_PAGE_ACCESS_TOKEN) ?
 	(process.env.MESSENGER_PAGE_ACCESS_TOKEN) :
 	config.get('pageAccessToken');
 router.get('/', function (req, res, next) {
-	res.sendFile('member.html', {
+	res.sendFile('index.html', {
+		root: "views/cms"
+	});
+});
+router.get('/index', function (req, res, next) {
+	res.sendFile('index.html', {
 		root: "views/cms"
 	});
 });
@@ -345,29 +350,11 @@ router.get('/getMemberByGroup', auth, (req, res) => {
 	if (req.session == null) {
 		return res.sendStatus(401);
 	}
-	res.setHeader('X-Frame-Options', 'ALLOW-FROM ' + router_URL);
+	//res.setHeader('X-Frame-Options', 'ALLOW-FROM ' + router_URL);
 	var code = req.query.code;
 	var options = {};
 	var pipeline = [];
-	if (code == "BlockStatus") {
-		pipeline = [{
-			"$group": {
-				"_id": {
-					"BlockStatus": "$BlockStatus"
-				},
-				"COUNT(_id)": {
-					"$sum": 1
-				}
-			}
-		}, {
-			"$project": {
-				"_id": 0,
-				"Total": "$COUNT(_id)",
-				"BlockStatus": "$_id.BlockStatus"
-			}
-		}];
-
-	} else if (code == "GeoCode") {
+	if (code == "GeoCode") {
 		pipeline = [{
 			"$group": {
 				"_id": {
@@ -413,6 +400,48 @@ router.get('/getMemberByGroup', auth, (req, res) => {
 
 		});
 	});
+});
+router.get('/getMemberOnline', (req, res) => {
+	res.setHeader('X-Frame-Options', 'ALLOW-FROM ' + SERVER_URL);
+	try {
+		var cDate = new Date();
+		var eDate = new Date();
+		eDate.setMinutes(cDate.getMinutes() + 15);
+
+		var query = {
+			ExpiredDate: {
+				$gte: cDate,
+				$lte: eDate
+			}
+		};
+		console.log("getMemberOnline query : ", query);
+		objDb.getConnection(function (client) {
+			objDb.findMemberOnline(query, client, function (results) {
+				client.close();
+				res.send(results);
+			});
+		});
+	} catch (err) {
+		console.error("getMemberOnline:", err);
+		res.send(null);
+	}
+});
+router.get('/getMemberConnect', (req, res) => {
+	res.setHeader('X-Frame-Options', 'ALLOW-FROM ' + SERVER_URL);
+	try {
+		var query = {};
+		console.log("getMemberConnect query : ", query);
+		objDb.getConnection(function (client) {
+			objDb.findMemberOnline(query, client, function (results) {
+				client.close();
+				res.send(results);
+
+			});
+		});
+	} catch (err) {
+		console.error("getMemberConnect:", err);
+		res.send(null);
+	}
 });
 router.get('/getListMemberApprovedById', authFace, (req, res) => {
 
