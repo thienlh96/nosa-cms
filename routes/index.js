@@ -5,7 +5,7 @@ var Cryptojs = require("crypto-js"); //Toanva add
 var objDb = require('../object/database.js');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const request = require('request');
+//const request = require('request');
 function creatCond(cond,req){
 	if (req.session.Level == 2) {
 		cond.$and.push({Provincial:req.session.Provincial});
@@ -1082,7 +1082,12 @@ server.post('/sendbroadcast.bot', auth, (req, res) => {
 			//	   res.send(results);
 			//console.log(results);
 			console.log('Total Broadcast send: ', results.length);
-			client.close();
+			var mydate = new Date();
+			var inputDate = new Date(mydate.toISOString());
+			var id = req.session.user;
+			var obj = { "Msg": msg, "senderId": id, "InsertDate": inputDate, "Totail": results.length, "Status": "P" };
+
+			var arrObject = [];
 			for (var i = 0; i < results.length; i++) {
 				var quickReplies = [{
 					content_type: "text",
@@ -1100,12 +1105,48 @@ server.post('/sendbroadcast.bot', auth, (req, res) => {
 					payload: "guide",
 					image_url: SERVER_URL + "/img/guide.png"
 				}];
-				msg = msg + ". Hãy cùng tiếp tục trò chuyện với Nosa nhé!"
+				//	msg = msg //+ ". Hãy cùng tiếp tục trò chuyện với Nosa nhé!"
 				///sendQuickMessage(senderID, msg, quickReplies);
-				sendQuickMessage(results[i]._id, msg, quickReplies)
+				sendQuickMessage(results[i]._id, msg, quickReplies);
+
+				arrObject[i] = { "Psid": results[i]._id, "Status": "P", "InsertDate": inputDate, "ReadTime": null };
 			}
-			mess.ss = "Số lượng tin nhắn bạn đã gửi thành công là : " + results.length + " tin";
-			res.send(mess);
+			obj.Detail = arrObject;
+			objDb.insertMessagesReads(obj, client, function (err, rsData) {
+				client.close();
+				mess.ss = "Số lượng tin nhắn bạn đã gửi thành công là : " + results.length + " tin";
+				res.send(mess);
+				//console.log("rsData:",rsData);
+				//				var arrObject=[];
+				//				for (var i = 0; i < results.length; i++) {
+				//					var quickReplies = [{
+				//						content_type: "text",
+				//						title: "Đồng ý",
+				//						payload: "confirm",
+				//						image_url: SERVER_URL + "/img/OkLike.png"
+				//					}, {
+				//						content_type: "text",
+				//						title: "Hỗ trợ",
+				//						payload: "help",
+				//						image_url: SERVER_URL + "/img/helps.png"
+				//					}, {
+				//						content_type: "text",
+				//						title: "Hướng dẫn",
+				//						payload: "guide",
+				//						image_url: SERVER_URL + "/img/guide.png"
+				//					}];
+				//					//	msg = msg //+ ". Hãy cùng tiếp tục trò chuyện với Nosa nhé!"
+				//						///sendQuickMessage(senderID, msg, quickReplies);
+				//					sendQuickMessage(results[i]._id, msg, quickReplies);
+				//					
+				//					arrObject[i]={"Id":rsData.insertedId,"Psid":results[i]._id,"Msg":msg,"Status":"P","InsertDate":inputDate};
+				//				}
+				//				objDb.insertMessagesReadsDetail(arrObject,client,function (err,rssss) {
+				//					client.close();
+				//					mess.ss = "Số lượng tin nhắn bạn đã gửi thành công là : " + results.length + " tin";
+				//					res.send(mess);
+				//				});
+			});
 		});
 	});
 
