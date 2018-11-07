@@ -5,7 +5,7 @@ var Cryptojs = require("crypto-js"); //Toanva add
 var objDb = require('../object/database.js');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const request = require('request');
+// const request = require('request');
 function creatCond(cond,req){
 	if (req.session.Level == 2) {
 		cond.$and.push({Provincial:req.session.Provincial});
