@@ -149,12 +149,16 @@ router.post('/unitloginCMS', function (req, res) {
 	}
 });
 router.get('/Info',(req,res) => {
-	res.send({
+	if (req.session.Level == null) {
+		return res.sendStatus(401);
+	}else{
+		res.send({
 		Level: req.session.Level,
 		Provincial: req.session.Provincial,
 		District: req.session.District,
 		Ward: req.session.Ward,
-	});
+		});
+	}
 });
 router.get('/getCountryCount', (req, res) => {
 	if (req.session == null) {
@@ -353,52 +357,73 @@ router.get('/getPosition', (req, res) => {
 	});
 });
 router.get('/getMemberByGroup', auth, (req, res) => {
-	if (req.session == null) {
+	if (req.session.Level == null) {
 		return res.sendStatus(401);
 	}
 	//res.setHeader('X-Frame-Options', 'ALLOW-FROM ' + router_URL);
 	var code = req.query.code;
 	var options = {};
 	var pipeline = [];
+	pipeline1 = [{
+		"$group": {
+			"_id": {
+				"Provincial": "$Provincial",
+				//"GeoCodeProvincial": "$GeoCodeProvincial"
+			},
+			"COUNT(_id)": {
+				"$sum": 1
+			}
+		}
+	}, {
+		"$project": {
+			"_id": 0,
+			"Total": "$COUNT(_id)",
+			"Provincial": "$_id.Provincial",
+		}
+	}];
+	pipeline2 = pipeline = [{
+		"$group": {
+			"_id": {
+				"Position": "$Position"
+			},
+			"COUNT(_id)": {
+				"$sum": 1
+			}
+		}
+	}, {
+		"$project": {
+			"_id": 0,
+			"Total": "$COUNT(_id)",
+			"Position": "$_id.Position"
+		}
+	}];
+	if(req.session.Level==2){
+		pipeline1[0].$group._id={District:"$District"};
+		pipeline1[1].$project.Provincial="$_id.District";
+		pipeline1.push({ $match: { Provincial: req.session.Provincial } });
+		pipeline2.push({ $match: { Provincial: req.session.Provincial } });
+	}
+	if(req.session.Level==3){
+		pipeline1[0].$group._id={Ward:"$Ward"};
+		pipeline1[1].$project.Provincial="$_id.Ward";
+		pipeline1.push({ $match: { District: req.session.District } });
+		pipeline2.push({ $match: { District: req.session.District } });
+	}
+	if(req.session.Level==4){
+		pipeline1[0].$group._id={Branch:"$Branch"};
+		pipeline1[1].$project.Provincial = "$_id.Branch";
+		pipeline1.push({ $match: { Ward: req.session.Ward } });
+		pipeline2.push({ $match: { Ward: req.session.Ward } });
+	}
+	if(req.session.Level==5)
+		return res.send({});
 	if (code == "GeoCode") {
-		pipeline = [{
-			"$group": {
-				"_id": {
-					"Provincial": "$Provincial",
-					"GeoCodeProvincial": "$GeoCodeProvincial"
-				},
-				"COUNT(_id)": {
-					"$sum": 1
-				}
-			}
-		}, {
-			"$project": {
-				"_id": 0,
-				"Total": "$COUNT(_id)",
-				"Provincial": "$_id.Provincial",
-				"GeoCodeProvincial": "$_id.GeoCodeProvincial"
-			}
-		}];
+		pipeline = pipeline1;
 
 	} else if (code == "Position") {
-		pipeline = [{
-			"$group": {
-				"_id": {
-					"Position": "$Position"
-				},
-				"COUNT(_id)": {
-					"$sum": 1
-				}
-			}
-		}, {
-			"$project": {
-				"_id": 0,
-				"Total": "$COUNT(_id)",
-				"Position": "$_id.Position"
-			}
-		}];
+		pipeline = pipeline2;
 	}
-	console.log("getMemberByGroup", code);
+	console.log("getMemberByGroup", pipeline);
 	objDb.getConnection(function (client) {
 		objDb.findMembersByGroup(pipeline, options, client, function (results) {
 			client.close();
@@ -858,6 +883,7 @@ router.get('/getMemberCMS', auth, (req, res) => {
 	var layer = req.query.layer;
 	var blockstatus = req.query.blockstatus;
 	var phone = req.query.phone;
+	var query={};
 	console.log('getMemberCMS');
 	if (psid == null || psid == 'all')
 		psid = "";
@@ -1199,5 +1225,4 @@ function callSendAPI(messageData) {
 			}
 		});
 };
-
 module.exports = router;

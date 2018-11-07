@@ -4,7 +4,11 @@ var cboProvincial = document.getElementById("cboProvincial");
 var cboPosition = document.getElementById("cboPosition");
 var cboDistricts = document.getElementById("cboDistricts");
 var cboWards = document.getElementById("cboWards");
-
+var Mydistrict = '';
+var Myprovincial = '';
+var Myward = '';
+var Mylevel = 4;
+var datatable;
 function cboLevelChange(event) {
     var value = event.value;
     if (value == '1') {
@@ -109,7 +113,7 @@ function LoadCboProvincials() {
         error: function (err) {
             if (err.responseText == 'Unauthorized') {
                 alert("Bạn đã bị time out");
-                window.location.href = 'login.html';
+            
             }
         }
     });
@@ -146,7 +150,6 @@ function LoadCboDistricts(idProvincial,name) {
         error: function (err) {
             if (err.responseText == 'Unauthorized') {
                 alert("Bạn đã bị time out");
-                window.location.href = 'login.html';
             }
         }
     });
@@ -182,7 +185,7 @@ function LoadCboWards(idDistrict) {
         error: function (err) {
             if (err.responseText == 'Unauthorized') {
                 alert("Bạn đã bị time out");
-                window.location.href = 'login.html';
+               
             }
         }
     });
@@ -198,6 +201,10 @@ info = $.ajax({
         ward = data.Ward;
         provincial = data.Provincial;
         district = data.District;
+        Mylevel=level;
+        Myprovincial=provincial;
+        Mydistrict=district;
+        Myward=ward;
         i = 1;
         while (level > i) {
             cboLevel.remove(i-1);
@@ -270,261 +277,189 @@ info = $.ajax({
             cboWards.append(o);
             cboWards.disabled = true;
             cboWards.selectedIndex=1;
-            $.ajax({
-                dataType: "json",
-                url: "/getWardCount",
-                data: {
-                    Ward: ward
+        }
+        SearchMember();
+    },
+    error: function (err) {
+        alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
+    }
+});
+function SearchMember() {
+    if(datatable==null){
+        datatable = $('#grvResult').DataTable({
+            scrollY: 400,
+            scrollX: true,
+            scrollCollapse: true,
+            select: true,
+            dom: 'Bfrtip',
+            buttons: [{
+                    extend: 'excelHtml5',
                 },
+                {
+                    extend: 'pdfHtml5',
+                }
+            ],
+            ajax: {
+                dataType: "json",
+                url: "/getMemberCMS",
                 beforeSend: loadStart,
                 complete: loadStop,
-                success: function (data) {
-                    render(level4);
-                    datatable.clear();
-                    drawTable(data);
-                }
-            });
-        }
-    }
-});
-var datatable = $('#grvResult').DataTable({
-    scrollY: 400,
-    scrollX: true,
-    scrollCollapse: true,
-    select: true,
-    dom: 'Bfrtip',
-    buttons: [
-        {
-            extend: 'excelHtml5',
-        },
-        {
-            extend: 'pdfHtml5',
-        }
-    ],
-    ajax: {
-        dataType: "json",
-        url: "/getMemberCMS",
-        beforeSend: loadStart,
-        complete: loadStop,
-        data: function (d) {
-            var name = "";
-            var provincial = "";
-            var districts = "";
-            var wards = "";
-            var blockstatus = "";
-            var position = "";
-            var layer = "";
-            var level = "";
-            if ($('#txtName').val() != "" && $('#txtName').val() != undefined)
-                name = $("#txtName").val();
-            if (cboProvincial.selectedIndex != 0)
-                provincial = cboProvincial[cboProvincial.selectedIndex].text;
-            if (cboDistricts.selectedIndex != 0)
-                districts = cboDistricts[cboDistricts.selectedIndex].text;
-            if (cboWards.selectedIndex != 0)
-                wards = cboWards[cboWards.selectedIndex].text;
-            level = cboLevel.value;
-            if (cboPosition.selectedIndex != 0)
-                position = cboPosition[cboPosition.selectedIndex].text;
-            
-            d.phone = $("#txtPhone").val();
-            d.name = name;
-            d.position = position;
-            d.blockstatus = blockstatus;
-            d.provincial = provincial;
-            d.districts = districts;
-            d.wards = wards;
-            d.level = level;
-            d.layer = "";
-            d.psid = "";
-        },
-        error: function(err) {
-            if (err.responseText == 'Unauthorized') {
-                alert("Bạn đã bị time out");
-                window.location.href = 'login.html';
-            }
-        },
-        dataSrc: ""
-    },
-    columns: [
-        {
-            data: 'ImgUrl', render: function (data, type, row, meta) {
-                return '<img src="' + data + '" height="80" width="80">';
-            }
-        },
-        {
-            data: 'Name', render: function (data, type, row, meta) {
-                return '<a href="#" onclick="ShowDetail(' + row._id + ')">' + data + '</a>';
-            }
-        },
-        {
-            data: 'Birthday', render: function (data, type, row, meta) {
-                return GetBirthDay(row.Birthday);
-            }
-        },
-        { data: 'Position', defaultContent: "" },
-        { data: 'Provincial', defaultContent: "" },
-        { data: 'District', defaultContent: "" },
-        { data: 'Ward', defaultContent: "" },
-        { data: 'Phone', defaultContent: "" },
-        { data: 'Email', defaultContent: "" },
-        {
-            data: 'BlockStatus', render: function (data, type, row, meta) {
-                return data === "ACTIVE" ? "Đã duyệt" : "Chưa duyệt";
-            }
-        }
-    ]
-});
+                data: function (d) {
+                    var name = "";
+                    var provincial = "";
+                    var districts = "";
+                    var wards = "";
+                    var position = "";
+                    var level = "";
+                    if ($('#txtName').val() != "" && $('#txtName').val() != undefined)
+                        name = $("#txtName").val();
+                    if (cboProvincial.selectedIndex != 0)
+                        provincial = cboProvincial[cboProvincial.selectedIndex].text;
+                    if (cboDistricts.selectedIndex != 0)
+                        districts = cboDistricts[cboDistricts.selectedIndex].text;
+                    if (cboWards.selectedIndex != 0)
+                        wards = cboWards[cboWards.selectedIndex].text;
+                    level = cboLevel.value;
+                    if (cboPosition.selectedIndex != 0)
+                        position = cboPosition[cboPosition.selectedIndex].text;
+                    if (Mylevel == 2) {
+                        provincial = Myprovincial;
+                    }
+                    if (Mylevel == 3) {
+                        district = Mydistrict;
+                    }
+                    if (Mylevel >= 4) {
+                        ward = Myward;
+                    }
+                    d.phone = $("#txtPhone").val();
+                    d.name = name;
+                    d.position = position;
+                    d.provincial = provincial;
+                    d.districts = districts;
+                    d.wards = wards;
+                    d.level = level;
+                },
+                error: function (err) {
+                    if (err.responseText == 'Unauthorized') {
+                        alert("Bạn đã bị time out");
 
-function SearchMember() {
-    datatable.ajax.reload();
-    datatable.draw();
+                    }
+                },
+                dataSrc: ""
+            },
+            columns: [{
+                    data: 'ImgUrl',
+                    render: function (data, type, row, meta) {
+                        return '<img src="' + data + '" height="80" width="80">';
+                    }
+                },
+                {
+                    data: 'Name',
+                    render: function (data, type, row, meta) {
+                        return '<a href="#">' + data + '</a>';
+                    }
+                },
+                {
+                    data: 'Birthday',
+                    render: function (data, type, row, meta) {
+                        return GetBirthDay(row.Birthday);
+                    }
+                },
+                {
+                    data: 'Position',
+                    defaultContent: ""
+                },
+                {
+                    data: 'Provincial',
+                    defaultContent: ""
+                },
+                {
+                    data: 'District',
+                    defaultContent: ""
+                },
+                {
+                    data: 'Ward',
+                    defaultContent: ""
+                },
+                {
+                    data: 'Phone',
+                    defaultContent: ""
+                },
+                {
+                    data: 'Email',
+                    defaultContent: ""
+                },
+
+            ]
+        });
+    }else {
+        datatable.ajax.reload();
+        datatable.draw();
+    }
 };
 
-function ShowDetail(id) {
-	tableInfoPending.clear();
-	tableInfoPending.draw();
-	$("#info_name").text('');
-	$("#info_level").text('');
-	$("#info_position").text('');
-	$("#info_birthday").text('');
-	$("#info_phone").text('');
-	$("#info_email").text('');
-	$("#info_address").text('');
-    $("#info_status").text('');
-    $('#info_img').attr('src', '../img/logo.jpg');
-    var imgAvatar = document.getElementById("info_img");
-    var objInfo;
-    $.ajax({
-        dataType: "json",
-        url: "/getMember?psid=" + id,
-        data: objInfo,
-        success: function (data) {
-            objInfo = data[0];
-            imgAvatar.src = objInfo.ImgUrl;
-            var date = new Date(objInfo.Birthday);
-           // var birthday = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
-			var status = objInfo.BlockStatus === "ACTIVE" ? "Đã duyệt":"Chưa duyệt";
-            $("#info_name").text(objInfo.Name);
-            $("#info_level").text(objInfo.LevelName);
-            $("#info_position").text(objInfo.Position);
-            $("#info_birthday").text(objInfo.Birthday);
-            $("#info_phone").text(objInfo.Phone);
-            $("#info_email").text(objInfo.Email);
-            $("#info_address").text(objInfo.Ward + ' - ' + objInfo.District + ' - ' + objInfo.Provincial );
-			$("#info_status").text(status);
-        }
-    });
-    var objMembers;
-    $.ajax({
-        dataType: "json",
-        url: "/getListMemberKsv?psid=" + id,
-        data: objMembers,
-        success: function (data) {
-            objMembers = data;
-            if(data !== null) drawTable(data);
-        }
-    });
-    $('#myModal').modal('show');
-}
-var tableInfoPending = $("#grvInfoPending").DataTable({
-	scrollY: 300,
-    scrollX: true,
-    scrollCollapse: true
-	});
-$('#myModal').on('shown.bs.tab', function(e){
-   $($.fn.dataTable.tables(true)).DataTable()
-      .columns.adjust();
-});
-$('#myModal').on('shown.bs.modal', function(e){
-   $($.fn.dataTable.tables(true)).DataTable()
-      .columns.adjust();
-});
-function drawTable(objMembers) {
-	
-    for (var i = 0; i < objMembers.length; i++) {
-        obj = objMembers[i];
-        if (obj.BlockStatus == 'PENDING') {
-            //var date = new Date(obj.Birthday);
-            //var birthday = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
-			var img = '<img id="img_infodetail" src="' + obj.ImgUrl + '" alt="Ảnh đại diện" class="img-responsive">';
-            var strRow = '';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Họ và Tên:</label><label class="margin0 col-sm-8"> ' + obj.Name + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Cấp cán bộ:</label><label class="margin0 col-sm-8"> ' + obj.LevelName + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Chức vụ:</label><label class="margin0 col-sm-8"> ' + obj.Position + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Ngày sinh:</label><label class="margin0 col-sm-8"> ' + obj.Birthday + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Điện thoại:</label><label class="margin0 col-sm-8"> ' + obj.Phone + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Email:</label><label class="margin0 col-sm-8"> ' + obj.Email + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Địa chỉ :</label><label class="margin0 col-sm-8"> ' + obj.Ward + ' - ' + obj.District + ' - '+ obj.Provincial + '</label></div>';
-            strRow = strRow + '<div class="col-sm-12"><label class="col-sm-4 text-right margin0">Trạng thái :</label><label class="margin0 col-sm-8"> Chờ duyệt</label></div>';
-            tableInfoPending.row.add([ img, strRow]).draw(false);
-        } 
-    }
-	tableInfoPending.draw();
-	 
-};
-function sendMess(){
-	    var r = confirm("Bạn có muốn gửi tin nhắn đến danh sách thành viên vừa lọc!");
-		if (r == true) 
-		{
-			var name = "";
-			var provincial = "";
-			var districts = "";
-			var wards = "";
-			var blockstatus = "";
-			var position = "";
-			var layer = "";
-			var level = "";
-			if ($('#txtName').val() != "" && $('#txtName').val() != undefined)
-					name = $("#txtName").val();
-			if (cboProvincial.selectedIndex != 0)
-				provincial = cboProvincial[cboProvincial.selectedIndex].text;
-			if (cboDistricts.selectedIndex != 0)
-				districts = cboDistricts[cboDistricts.selectedIndex].text;
-			if (cboWards.selectedIndex != 0)
-				wards = cboWards[cboWards.selectedIndex].text;
-			level = cboLevel.value;
-			if (cboPosition.selectedIndex != 0)
-				position = cboPosition[cboPosition.selectedIndex].text;
+// function sendMess(){
+// 	    var r = confirm("Bạn có muốn gửi tin nhắn đến danh sách thành viên vừa lọc!");
+// 		if (r == true) 
+// 		{
+// 			var name = "";
+// 			var provincial = "";
+// 			var districts = "";
+// 			var wards = "";
+// 			var blockstatus = "";
+// 			var position = "";
+// 			var layer = "";
+// 			var level = "";
+// 			if ($('#txtName').val() != "" && $('#txtName').val() != undefined)
+// 					name = $("#txtName").val();
+// 			if (cboProvincial.selectedIndex != 0)
+// 				provincial = cboProvincial[cboProvincial.selectedIndex].text;
+// 			if (cboDistricts.selectedIndex != 0)
+// 				districts = cboDistricts[cboDistricts.selectedIndex].text;
+// 			if (cboWards.selectedIndex != 0)
+// 				wards = cboWards[cboWards.selectedIndex].text;
+// 			level = cboLevel.value;
+// 			if (cboPosition.selectedIndex != 0)
+// 				position = cboPosition[cboPosition.selectedIndex].text;
 
-			if (txtMess.value == undefined || txtMess.value == "") {
-				alert("Bạn phải nhập nội dung tin nhắn");			
-				txtMess.focus();
-				return;
-			};
-			var mess = {};
-			mess.Msg=txtMess.value;
-			mess.phone = $("#txtPhone").val();
-			mess.name = name;
-			mess.provincial=provincial;
-			mess.districts=districts;
-			mess.wards=wards;
-			mess.blockstatus=blockstatus;
-			mess.position=position;
-			mess.level = level;
-			mess.layer = "";
-			//alert(objAi.Id);
-			$.ajax({
-			type: 'POST',
-			data: JSON.stringify(mess),
-			contentType: 'application/json',
-			url: '/sendbroadcast.bot',				
-			success: function(data) 
-					{
+// 			if (txtMess.value == undefined || txtMess.value == "") {
+// 				alert("Bạn phải nhập nội dung tin nhắn");			
+// 				txtMess.focus();
+// 				return;
+// 			};
+// 			var mess = {};
+// 			mess.Msg=txtMess.value;
+// 			mess.phone = $("#txtPhone").val();
+// 			mess.name = name;
+// 			mess.provincial=provincial;
+// 			mess.districts=districts;
+// 			mess.wards=wards;
+// 			mess.blockstatus=blockstatus;
+// 			mess.position=position;
+// 			mess.level = level;
+// 			mess.layer = "";
+// 			//alert(objAi.Id);
+// 			$.ajax({
+// 			type: 'POST',
+// 			data: JSON.stringify(mess),
+// 			contentType: 'application/json',
+// 			url: '/sendbroadcast.bot',				
+// 			success: function(data) 
+// 					{
 
-						//console.log('success');
-						alert(data.ss);
-						console.log(data);
+// 						//console.log('success');
+// 						alert(data.ss);
+// 						console.log(data);
 
-					},
-				error: function(err) {
-				 if(err.responseText=-'Unauthorized')
-				  alert("Bạn đã bị time out");
-				  window.location.href = 'login.html';
-				}
-		   });
-		}
-}
+// 					},
+// 				error: function(err) {
+// 				 if(err.responseText=-'Unauthorized')
+// 				  alert("Bạn đã bị time out");
+// 				  window.location.href = 'login.html';
+// 				}
+// 		   });
+// 		}
+// }
 
 
 function loadStart() {

@@ -1,8 +1,25 @@
-google.charts.setOnLoadCallback(onInit);
+
 var piechartBlockStatus;
 var piechartGeoCode;
 var piechartPosition;
 var isComplate=true;
+$.ajax({
+	dataType: "json",
+	url: "/Info",
+	type: "GET",
+	dataType: "json",
+	data: {},
+	success: function (data) {
+		level = data.Level;
+		ward = data.Ward;
+		provincial = data.Provincial;
+		district = data.District;
+		google.charts.setOnLoadCallback(onInit);
+	},
+	error: function (err) {
+		alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
+	}
+});
 function onInit(){
  piechartGeoCode = new google.visualization.PieChart(document.getElementById('dvGeoCode'));
  piechartPosition = new google.visualization.PieChart(document.getElementById('dvPosition'));
@@ -12,7 +29,6 @@ function onInit(){
  getData();
 	
 };
-
 function getData(){
 	if(isComplate)
 	{
@@ -29,9 +45,7 @@ function getData(){
 			    drawGeoCode(objGeoCode);
 			 },
 		  	error: function(err) {
-			 if(err.responseText=-'Unauthorized')
-			  alert("Bạn đã bị time out");
-			  window.location.href = 'login.html';
+			  alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
 			}            
 		});
 		
@@ -45,9 +59,7 @@ function getData(){
 			drawPosition(objPosition);
 			 },
 		  	error: function(err) {
-			 if(err.responseText=-'Unauthorized')
-			  alert("Bạn đã bị time out");
-			  window.location.href = 'login.html';
+			 alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
 			}            
 		});
 		
@@ -63,9 +75,7 @@ function getData(){
 			//drawPosition(objPosition);
 			 },
 		  	error: function(err) {
-			 if(err.responseText=-'Unauthorized')
-			  alert("Bạn đã bị time out");
-			  window.location.href = 'login.html';
+			alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
 			}            
 		});
 		var objPosition;		
@@ -80,9 +90,7 @@ function getData(){
 			//drawPosition(objPosition);
 			 },
 		  	error: function(err) {
-			 if(err.responseText=-'Unauthorized')
-			  alert("Bạn đã bị time out");
-			  window.location.href = 'login.html';
+			 alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
 			}            
 		});
 		
@@ -207,6 +215,6 @@ piechartPosition.draw(dataProduct, piechartProduct);
 	//oldObjGroupProduct=objGroupProduct;
 	
 isComplate=true;	
-setTimeout(getData,5000);	
+;
 };
 

@@ -444,6 +444,9 @@ info = $.ajax({
         provincial=data.Provincial;
         district=data.District;
         LoadWeb();
+    },
+    error: function(err){
+        alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
     }
 });
 function loadStart() {
