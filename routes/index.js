@@ -334,7 +334,13 @@ router.get('/getBranch', (req, res) => {
 	//res.send(req.query.idProvincial);
 });
 router.post('/getkeyCMS', function (req, res) {
-	res.send(req.sessionID);
+	let body = req.body;
+	if (req.session.cms_key == null) {
+		req.session.cms_key = req.sessionID;
+		res.send(req.sessionID);
+	} else {
+		res.send(req.session.cms_key);
+	}
 });
 router.get('/getPosition', (req, res) => {
 	var query = {};
