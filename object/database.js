@@ -1111,5 +1111,19 @@ module.exports = {
     		console.log("updateBtcOtp BlockStatus: ACTIVE success");
     		callback(null, res);
     	});
-    },
+	},
+	insertMessagesReads: function (objMessage, client, callback) {
+		// Get the documents collection
+		const db = client.db(DATA_BASE_NAME);
+		const collection = db.collection('MessagesReads');
+		//var objCallback = null;
+		//console.log("objAiMessage :",objAiMessage);
+		collection.insertOne(objMessage, function (err, res) {
+			//neu xay ra loi
+			if (err) throw err;
+			//neu khong co loi			
+			//console.log('Them thanh cong :',objMember);
+			callback(null, res);
+		});
+	},
 }

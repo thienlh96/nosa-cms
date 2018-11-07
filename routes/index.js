@@ -5,7 +5,7 @@ var Cryptojs = require("crypto-js"); //Toanva add
 var objDb = require('../object/database.js');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-// const request = require('request');
+const request = require('request');
 function creatCond(cond,req){
 	if (req.session.Level == 2) {
 		cond.$and.push({Provincial:req.session.Provincial});
@@ -997,75 +997,166 @@ router.get('/getKycMembers', authKsv, (req, res) => {
 		});
 	});
 });
-// router.post('/sendbroadcast.bot', auth, (req, res) => {
-// 	let body = req.body;
-// 	var msg = body.Msg;
-// 	if (req.session == null) {
-// 		return res.sendStatus(401);
-// 	}
-// 	var query={};
-// 	var mess = {};
-// 	objDb.getConnection(function (client) {
-// 		objDb.findMembers(query, client, function (results) {
-// 			//	   res.send(results);
-// 			console.log(query, req.query);
-// 			console.log('Total Broadcast send: ', results.length);
-// 			client.close();
-// 			for (var i = 0; i <1; i++) {
-// 				//sendTextMessage(results[i]._id, msg)
-// 			}
-// 			mess.ss = "Gửi thành công " + results.length + " tin";
-// 		});
-// 	});
-// 	res.send(mess);
+server.post('/sendbroadcast.bot', auth, (req, res) => {
+	let body = req.body;
+	var msg = body.Msg;
+	var provincial = body.provincial;
+	var districts = body.districts;
+	var wards = body.wards;
+	var position = body.position;
+	var level = body.level;
+	var layer = body.layer;
+	var blockstatus = body.blockstatus;
+	var name = body.name;
+	var phone = body.phone;
+	if (name == null || name == 'all')
+		name = "";
+	if (provincial == null || provincial == 'all' || provincial == 'NA')
+		provincial = "";
+	if (districts == null || districts == 'all' || districts == 'NA')
+		districts = "";
+	if (wards == null || wards == 'all' || wards == 'NA')
+		wards = "";
+	if (position == null || position == 'all' || position == 'NA')
+		position = "";
+	if (level == null || level == 'all' || level == 'NA')
+		level = "";
+	if (layer == null || layer == 'all' || layer == 'NA')
+		layer = "";
+	if (blockstatus == null || blockstatus == 'all')
+		blockstatus = "";
+	if (phone == null || phone == 'all')
+		phone = "";
 
-// });
-// function sendTextMessage(recipientId, messageText) {
-// 	var messageData = {
-// 		recipient: {
-// 			id: recipientId
-// 		},
-// 		message: {
-// 			text: messageText,
-// 			metadata: "DEVELOPER_DEFINED_METADATA"
-// 		}
-// 	};
+	var query = {};
+	if (name != "") {
+		name = ".*" + name + ".*";
+		Object.assign(query, {
+			Name: {
+				$regex: name
+			}
+		});
+	}
+	if (phone != "") {
+		phone = ".*" + phone + ".*";
+		Object.assign(query, {
+			Phone: {
+				$regex: phone
+			}
+		});
+	}
+	if (blockstatus != "") {
+		Object.assign(query, {
+			BlockStatus: blockstatus
+		});
+	}
+	if (level != "") {
+		Object.assign(query, {
+			Level: parseInt(level)
+		});
+	}
+	if (provincial != "") {
+		Object.assign(query, {
+			Provincial: provincial
+		});
+	}
+	if (districts != "") {
+		Object.assign(query, {
+			District: districts
+		});
+	}
+	if (wards != "") {
+		Object.assign(query, {
+			Ward: wards
+		});
+	}
+	if (position != "") {
+		Object.assign(query, {
+			Position: position
+		});
+	}
+	var mess = {};
+	console.log("Send broadcast query: ", query);
+	objDb.getConnection(function (client) {
+		objDb.findMembers(query, client, function (results) {
+			//	   res.send(results);
+			//console.log(results);
+			console.log('Total Broadcast send: ', results.length);
+			client.close();
+			for (var i = 0; i < results.length; i++) {
+				var quickReplies = [{
+					content_type: "text",
+					title: "Đồng ý",
+					payload: "confirm",
+					image_url: SERVER_URL + "/img/OkLike.png"
+				}, {
+					content_type: "text",
+					title: "Hỗ trợ",
+					payload: "help",
+					image_url: SERVER_URL + "/img/helps.png"
+				}, {
+					content_type: "text",
+					title: "Hướng dẫn",
+					payload: "guide",
+					image_url: SERVER_URL + "/img/guide.png"
+				}];
+				msg = msg + ". Hãy cùng tiếp tục trò chuyện với Nosa nhé!"
+				///sendQuickMessage(senderID, msg, quickReplies);
+				sendQuickMessage(results[i]._id, msg, quickReplies)
+			}
+			mess.ss = "Số lượng tin nhắn bạn đã gửi thành công là : " + results.length + " tin";
+			res.send(mess);
+		});
+	});
 
-// 	callSendAPI(messageData);
-// };
-// function callSendAPI(messageData) {
-// 	///console.log("callSendAPI",request) ;
 
-// 	//console.log("callSendAPI:",messageData.recipient.id)
-// 	request({
-// 			uri: 'https://graph.facebook.com/v3.1/me/messages',
-// 			qs: {
-// 				access_token: PAGE_ACCESS_TOKEN
-// 			},
-// 			method: 'POST',
-// 			json: messageData
+});
+function sendQuickMessage(recipientId, msg, quickReplies) {
+	var messageData = {
+		recipient: {
+			id: recipientId
+		},
+		message: {
+			text: msg,
+			quick_replies: quickReplies
+		}
 
-// 		},
-// 		function (error, response, body) {
-// 			if (!error && response.statusCode == 200) {
+	};
+	callSendAPI(messageData);
+};
+function callSendAPI(messageData) {
+	///console.log("callSendAPI",request) ;
+
+	//console.log("callSendAPI:",messageData.recipient.id)
+	request({
+			uri: 'https://graph.facebook.com/v3.1/me/messages',
+			qs: {
+				access_token: PAGE_ACCESS_TOKEN
+			},
+			method: 'POST',
+			json: messageData
+
+		},
+		function (error, response, body) {
+			if (!error && response.statusCode == 200) {
 
 
-// 				var recipientId = body.recipient_id;
-// 				var messageId = body.message_id;
-// 				//sendTypingOff(recipientId);
-// 				if (messageId) {
-// 					console.log("Successfully sent message with id %s to recipient %s",
-// 						messageId, recipientId);
-// 				} else {
-// 					console.log("Successfully called Send API for recipient %s",
-// 						recipientId);
-// 				}
+				var recipientId = body.recipient_id;
+				var messageId = body.message_id;
+				//sendTypingOff(recipientId);
+				if (messageId) {
+					console.log("Successfully sent message with id %s to recipient %s",
+						messageId, recipientId);
+				} else {
+					console.log("Successfully called Send API for recipient %s",
+						recipientId);
+				}
 
-// 			} else {
-// 				//console.error("Failed calling Send API", response.statusCode, response.statusMessage, body.error);
-// 				console.error(response.error);
-// 			}
-// 		});
-// };
+			} else {
+				console.error("Failed calling Send API", response.statusCode, response.statusMessage, body.error);
+				console.error(response.error);
+			}
+		});
+};
 
 module.exports = router;
