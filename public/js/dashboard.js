@@ -25,10 +25,7 @@ function onInit() {
 	piechartGeoCode = new google.visualization.PieChart(document.getElementById('dvGeoCode'));
 	piechartPosition = new google.visualization.PieChart(document.getElementById('dvPosition'));
 	lblTotalUser = document.getElementById('lblTotalUser');
-	lblUserOnline = document.getElementById('lblUserOnline');
-
 	getData();
-
 };
 
 function getData() {
@@ -61,80 +58,6 @@ function getData() {
 			alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
 		}
 	});
-
-	var objPosition;
-	$.ajax({
-		dataType: "json",
-		url: "/getMemberOnline",
-		data: objPosition,
-		success: function (data) {
-
-			lblUserOnline.innerHTML = data.length;
-			//objPosition=data;
-			//drawPosition(objPosition);
-		},
-		error: function (err) {
-			alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
-		}
-	});
-	var objPosition;
-	$.ajax({
-		dataType: "json",
-		url: "/getMemberConnect",
-		data: objPosition,
-		success: function (data) {
-
-			lblTotalUser.innerHTML = data.length;
-			//objPosition=data;
-			//drawPosition(objPosition);
-		},
-		error: function (err) {
-			alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
-		}
-	});
-
-};
-
-function drawBlockStatus(objBlockStatus) {
-
-	var dataProduct = new google.visualization.DataTable();
-	dataProduct.addColumn('string', 'Trạng thái');
-	dataProduct.addColumn('number', 'Thành viên');
-
-	//var total=0; 
-	var len = objBlockStatus.length;
-	for (var i = 0; i < len; ++i) {
-		//var o = new Option(objProvincials[i-1].Name,  objProvincials[i-1]._id);
-		var name = objBlockStatus[i].BlockStatus;
-		//var geoCode=objBlockStatus[i-1].GeoCode;
-		dataProduct.addRow([name, objBlockStatus[i].Total]);
-		//total=total+objBlockStatus[j].Total;
-	}
-
-
-
-	var piechartProduct = {
-		title: 'Thành viên phân bổ theo trạng thái',
-		width: 450,
-		height: 300,
-		is3D: true
-	};
-	piechartBlockStatus.draw(dataProduct, piechartProduct);
-	//google.visualization.events.addListener(piechartBlockStatus, 'select', function() {
-	//
-	//	var selectedItem = piechartBlockStatus.getSelection()[0];
-	//	if (selectedItem && piechartBlockStatus.getSelection().length>0) {
-	//	 // console.log(data.getValue(selectedItem.row, 0));
-	//	 // console.log(data.getFormattedValue(selectedItem.row, 0));
-	//	 // piechart.setSelection(chart.getSelection());
-	//	  SearcProduct(dataProduct.getFormattedValue(selectedItem.row, 0));
-	//	}
-	//
-	//});
-	//oldObjGroupProduct=objGroupProduct;
-
-	isComplate = true;
-	setTimeout(getData, 5000);
 };
 
 function drawGeoCode(objGeoCode) {
@@ -145,25 +68,31 @@ function drawGeoCode(objGeoCode) {
 
 	//var total=0; 
 	var len = objGeoCode.length;
+	total=0;
+	var str='Toàn Quốc';
 	for (var i = 0; i < len; ++i) {
 		//var o = new Option(objProvincials[i-1].Name,  objProvincials[i-1]._id);
 		var name = objGeoCode[i].Provincial;
 		if (name == "NA") {
 			if (level == 2) {
-				name = 'Cấp tỉnh'
+				name = 'Cấp tỉnh';
+				str=provincial;
 			}
 			if (level == 3) {
-				name == 'Cấp huyện'
+				name == 'Cấp huyện';
+				str=district;
 			}
 			if (level == 4) {
-				name = 'Cấp xã'
+				name = 'Cấp xã';
+				str=ward;
 			}
 		}
+		total += objGeoCode[i].Total;
 		//var geoCode=objBlockStatus[i-1].GeoCode;
 		dataProduct.addRow([name, objGeoCode[i].Total]);
 		//total=total+objBlockStatus[j].Total;
 	}
-
+	lblTotalUser=str+ ' có tổng số ' + total +' người đã kết nối vơi hệ thống.'
 
 
 	var piechartProduct = {
@@ -173,21 +102,6 @@ function drawGeoCode(objGeoCode) {
 		is3D: true
 	};
 	piechartGeoCode.draw(dataProduct, piechartProduct);
-	//google.visualization.events.addListener(piechartBlockStatus, 'select', function() {
-	//
-	//	var selectedItem = piechartBlockStatus.getSelection()[0];
-	//	if (selectedItem && piechartBlockStatus.getSelection().length>0) {
-	//	 // console.log(data.getValue(selectedItem.row, 0));
-	//	 // console.log(data.getFormattedValue(selectedItem.row, 0));
-	//	 // piechart.setSelection(chart.getSelection());
-	//	  SearcProduct(dataProduct.getFormattedValue(selectedItem.row, 0));
-	//	}
-	//
-	//});
-	//oldObjGroupProduct=objGroupProduct;
-
-	isComplate = true;
-	setTimeout(getData, 5000);
 };
 
 function drawPosition(objPosition) {
@@ -205,9 +119,6 @@ function drawPosition(objPosition) {
 		dataProduct.addRow([name, objPosition[i].Total]);
 		//total=total+objBlockStatus[j].Total;
 	}
-
-
-
 	var piechartProduct = {
 		title: 'Thành viên phân bổ theo chức vụ',
 		width: 447,
@@ -215,18 +126,4 @@ function drawPosition(objPosition) {
 		is3D: true
 	};
 	piechartPosition.draw(dataProduct, piechartProduct);
-	//google.visualization.events.addListener(piechartBlockStatus, 'select', function() {
-	//
-	//	var selectedItem = piechartBlockStatus.getSelection()[0];
-	//	if (selectedItem && piechartBlockStatus.getSelection().length>0) {
-	//	 // console.log(data.getValue(selectedItem.row, 0));
-	//	 // console.log(data.getFormattedValue(selectedItem.row, 0));
-	//	 // piechart.setSelection(chart.getSelection());
-	//	  SearcProduct(dataProduct.getFormattedValue(selectedItem.row, 0));
-	//	}
-	//
-	//});
-	//oldObjGroupProduct=objGroupProduct;
-
-	isComplate = true;;
 };
