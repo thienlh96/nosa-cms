@@ -26,7 +26,7 @@ function setDataPosition(position, layer) {
     while (cboPosition.length > 0) {
         cboPosition.remove(0);
     }
-    var o = new Option("Tất cả", "0");
+    var o = new Option("Tất cả - Chức vụ", "0");
     //o.selected=true;
     $("#cboPosition").append(o);
     for (var i = 0, len = position.length; i < len; ++i) {
@@ -95,7 +95,7 @@ function LoadCboProvincials() {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Chọn Tỉnh/TP", "0");
+            var o = new Option("Chọn Tỉnh/TP - Tất cả", "0");
             //o.selected=true;
             $("#cboProvincial").append(o);
             for (var i = 1, len = objProvincials.length + 1; i < len; ++i) {
@@ -169,7 +169,7 @@ function LoadCboWards(idDistrict) {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Chọn Xã/Phường", "0");
+            var o = new Option("Chọn Xã/Phường - Tất cả", "0");
             $("#cboWards").append(o);
             for (var i = 1, len = objWards.length + 1; i < len; ++i) {
                 var o = new Option(objWards[i - 1].Name, objWards[i - 1]._id);

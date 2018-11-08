@@ -32,72 +32,67 @@ function onInit() {
 };
 
 function getData() {
-	if (isComplate) {
-		isComplate = false;
 
-		var objBlockStatus;
-		var objGeoCode;
-		$.ajax({
-			dataType: "json",
-			url: "/getMemberByGroup?code=GeoCode",
-			data: objGeoCode,
-			success: function (data) {
-				objGeoCode = data;
-				drawGeoCode(objGeoCode);
-			},
-			error: function (err) {
-				alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
-			}
-		});
+	var objBlockStatus;
+	var objGeoCode;
+	$.ajax({
+		dataType: "json",
+		url: "/getMemberByGroup?code=GeoCode",
+		data: objGeoCode,
+		success: function (data) {
+			objGeoCode = data;
+			drawGeoCode(objGeoCode);
+		},
+		error: function (err) {
+			alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
+		}
+	});
 
-		var objPosition;
-		$.ajax({
-			dataType: "json",
-			url: "/getMemberByGroup?code=Position",
-			data: objPosition,
-			success: function (data) {
-				objPosition = data;
-				drawPosition(objPosition);
-			},
-			error: function (err) {
-				alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
-			}
-		});
+	var objPosition;
+	$.ajax({
+		dataType: "json",
+		url: "/getMemberByGroup?code=Position",
+		data: objPosition,
+		success: function (data) {
+			objPosition = data;
+			drawPosition(objPosition);
+		},
+		error: function (err) {
+			alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
+		}
+	});
 
-		var objPosition;
-		$.ajax({
-			dataType: "json",
-			url: "/getMemberOnline",
-			data: objPosition,
-			success: function (data) {
+	var objPosition;
+	$.ajax({
+		dataType: "json",
+		url: "/getMemberOnline",
+		data: objPosition,
+		success: function (data) {
 
-				lblUserOnline.innerHTML = data.length;
-				//objPosition=data;
-				//drawPosition(objPosition);
-			},
-			error: function (err) {
-				alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
-			}
-		});
-		var objPosition;
-		$.ajax({
-			dataType: "json",
-			url: "/getMemberConnect",
-			data: objPosition,
-			success: function (data) {
+			lblUserOnline.innerHTML = data.length;
+			//objPosition=data;
+			//drawPosition(objPosition);
+		},
+		error: function (err) {
+			alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
+		}
+	});
+	var objPosition;
+	$.ajax({
+		dataType: "json",
+		url: "/getMemberConnect",
+		data: objPosition,
+		success: function (data) {
 
-				lblTotalUser.innerHTML = data.length;
-				//objPosition=data;
-				//drawPosition(objPosition);
-			},
-			error: function (err) {
-				alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
-			}
-		});
+			lblTotalUser.innerHTML = data.length;
+			//objPosition=data;
+			//drawPosition(objPosition);
+		},
+		error: function (err) {
+			alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
+		}
+	});
 
-	} else {
-		setTimeout(getData, 5000);
-	}
 };
 
 function drawBlockStatus(objBlockStatus) {

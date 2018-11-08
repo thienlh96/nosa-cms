@@ -99,7 +99,7 @@ function LoadCboProvincials() {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Chọn Tỉnh/TP", "0");
+            var o = new Option("Chọn Tỉnh/TP - Tất cả", "0");
             //o.selected=true;
             $("#cboProvincial").append(o);
             for (var i = 1, len = objProvincials.length + 1; i < len; ++i) {
@@ -136,7 +136,7 @@ function LoadCboDistricts(idProvincial,name) {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Tất cả", "0");
+            var o = new Option("Chọn Quận/Huyện - Tất cả", "0");
             $("#cboDistricts").append(o);
             for (var i = 1, len = objDistricts.length + 1; i < len; ++i) {
                 var o = new Option(objDistricts[i - 1].Name, objDistricts[i - 1]._id);
@@ -172,7 +172,7 @@ function LoadCboWards(idDistrict) {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Chọn Xã/Phường", "0");
+            var o = new Option("Chọn Xã/Phường - Tất cả", "0");
             $("#cboWards").append(o);
             for (var i = 1, len = objWards.length + 1; i < len; ++i) {
                 var o = new Option(objWards[i - 1].Name, objWards[i - 1]._id);
