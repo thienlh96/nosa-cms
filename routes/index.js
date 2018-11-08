@@ -365,6 +365,8 @@ router.get('/getMemberByGroup', auth, (req, res) => {
 	var options = {};
 	var pipeline = [];
 	pipeline1 = [{
+				'$match': {}
+			}, {
 		"$group": {
 			"_id": {
 				"Provincial": "$Provincial",
@@ -382,6 +384,8 @@ router.get('/getMemberByGroup', auth, (req, res) => {
 		}
 	}];
 	pipeline2 = pipeline = [{
+				'$match': {}
+			}, {
 		"$group": {
 			"_id": {
 				"Position": "$Position"
@@ -398,22 +402,22 @@ router.get('/getMemberByGroup', auth, (req, res) => {
 		}
 	}];
 	if(req.session.Level==2){
-		pipeline1[0].$group._id={District:"$District"};
-		pipeline1[1].$project.Provincial="$_id.District";
-		pipeline1.push({ $match: { Provincial: req.session.Provincial } });
-		pipeline2.push({ $match: { Provincial: req.session.Provincial } });
+		pipeline1[1].$group._id={District:"$District"};
+		pipeline1[2].$project.Provincial="$_id.District";
+		pipeline1[0].$match= { Provincial: req.session.Provincial };
+		pipeline2[0].$match= { Provincial: req.session.Provincial };
 	}
 	if(req.session.Level==3){
-		pipeline1[0].$group._id={Ward:"$Ward"};
-		pipeline1[1].$project.Provincial="$_id.Ward";
-		pipeline1.push({ $match: { District: req.session.District } });
-		pipeline2.push({ $match: { District: req.session.District } });
+		pipeline1[1].$group._id={Ward:"$Ward"};
+		pipeline1[2].$project.Provincial="$_id.Ward";
+		pipeline1[0].$match= { District: req.session.District } ;
+		pipeline2[0].$match={ District: req.session.District };
 	}
 	if(req.session.Level==4){
-		pipeline1[0].$group._id={Branch:"$Branch"};
-		pipeline1[1].$project.Provincial = "$_id.Branch";
-		pipeline1.push({ $match: { Ward: req.session.Ward } });
-		pipeline2.push({ $match: { Ward: req.session.Ward } });
+		pipeline1[1].$group._id={Branch:"$Branch"};
+		pipeline1[2].$project.Provincial = "$_id.Branch";
+		pipeline1[0].$match= { Ward: req.session.Ward } ;
+		pipeline2[0].$match= { Ward: req.session.Ward };
 	}
 	if(req.session.Level==5)
 		return res.send({});
