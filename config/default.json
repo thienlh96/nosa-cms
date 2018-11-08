@@ -3,6 +3,6 @@
   "pageAccessToken": "EAAbvSU7d21MBALiDOld1sp2oU9x6ZARk5p2688EMWq26bLsy5UHRRZB8SziuQmqNA3fhMmBzArZAed6J0XruzAMpjBlp9jCJZCORdEDPpbwYZBVIJWOU5r1qKddfgN9emZBHBPrBHpGACdUmDeboZB86IZBnoTKJZC0yLkROBWNT4VwZDZD",
   "validationToken": "verify-token-nsvn",
   "serverURL": "https://nosa-cms.herokuapp.com/",
-  "mongoUrl": "mongodb://nsvn:nsvn6688@ds251849.mlab.com:51849/heroku_g41d98gw",
-  "databasename": "heroku_g41d98gw"
+  "mongoUrl": "mongodb://root:aicheukux4Eeg2eiThoh0aiwohvaHier@35.240.175.168:27017/?authMechanism=SCRAM-SHA-1&authSource=admin&connectTimeoutMS=30000&maxIdleTimeMS=600000",
+  "databasename": "Nosa"
 }
