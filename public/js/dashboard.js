@@ -24,7 +24,6 @@ $.ajax({
 function onInit() {
 	piechartGeoCode = new google.visualization.PieChart(document.getElementById('dvGeoCode'));
 	piechartPosition = new google.visualization.PieChart(document.getElementById('dvPosition'));
-	lblTotalUser = document.getElementById('lblTotalUser');
 	getData();
 };
 
@@ -92,7 +91,7 @@ function drawGeoCode(objGeoCode) {
 		dataProduct.addRow([name, objGeoCode[i].Total]);
 		//total=total+objBlockStatus[j].Total;
 	}
-	lblTotalUser=str+ ' có tổng số ' + total +' người đã kết nối vơi hệ thống.'
+	 document.getElementById('lblTotalUser').innerHTML= str + ' có tổng số ' + total + ' người đã kết nối vơi hệ thống.'
 
 
 	var piechartProduct = {
