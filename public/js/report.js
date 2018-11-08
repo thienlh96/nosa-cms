@@ -57,12 +57,23 @@ var provincial = '';
 var ward = '';
 var level = 4;
 function drawTable(objMembers) {
+    str='TW';
+    if(level==2)
+        str=provincial;
+    if(level==3)
+        str=district;
+    if(level==4)
+        str=ward;
+    if(level==5)
+        str='';
     for (var i = 0; i < objMembers.length; i++) {
         arr = Object.values(objMembers[i]);
         var pos = '';
         Object.keys(arr[2]).forEach(function (k) {
             pos+= k + " (" + arr[2][k] + ") ,";
         });
+        if(arr[0]=='NA')
+            arr[0]=str;
         datatable.row.add([arr[0], pos, arr[1]]).draw(false);
     }
     datatable.draw();
@@ -86,7 +97,7 @@ function LoadCboProvincials() {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Tất cả - Chọn Tỉnh/TP", "0");
+            var o = new Option("Tất cả", "0");
             //o.selected=true;
             $("#cboProvincial").append(o);
             for (var i = 1, len = objProvincials.length + 1; i < len; ++i) {
@@ -136,8 +147,8 @@ function onCboProvincialsChange(event) {
                 drawTable(data);
             }
         });
-        cboDistricts.innerHTML = '<option value="0">Tất cả - Chọn Quận/Huyện</option>';
-        cboWards.innerHTML = '<option value="0">Tất cả - Chọn Xã/Phường</option>';
+        cboDistricts.innerHTML = '<option value="0">Tất cả </option>';
+        cboWards.innerHTML = '<option value="0">Tất cả </option>';
     }
 };
 
@@ -153,7 +164,7 @@ function LoadCboDistricts(idProvincial) {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Tất cả - Chọn Quận/Huyện", "0");
+            var o = new Option("Tất cả ", "0");
             $("#cboDistricts").append(o);
             for (var i = 1, len = objDistricts.length + 1; i < len; ++i) {
                 var o = new Option(objDistricts[i - 1].Name, objDistricts[i - 1]._id);
@@ -207,7 +218,7 @@ function onCboDistrictsChange(event) {
                 drawTable(data);
             }
         });
-        cboWards.innerHTML = '<option value="0">Tất cả - Chọn Xã/Phường</option>';
+        cboWards.innerHTML = '<option value="0">Tất cả</option>';
     }
 };
 
@@ -223,7 +234,7 @@ function LoadCboWards(idDistrict) {
             while (selectElemRef.length > 0) {
                 selectElemRef.remove(0);
             }
-            var o = new Option("Tất cả- Chọn Xã/Phường", "0");
+            var o = new Option("Tất cả", "0");
             $("#cboWards").append(o);
             for (var i = 1, len = objWards.length + 1; i < len; ++i) {
                 var o = new Option(objWards[i - 1].Name, objWards[i - 1]._id);
