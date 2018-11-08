@@ -3,6 +3,7 @@ var piechartBlockStatus;
 var piechartGeoCode;
 var piechartPosition;
 var isComplate=true;
+var level;
 $.ajax({
 	dataType: "json",
 	url: "/Info",
@@ -150,6 +151,17 @@ function drawGeoCode(objGeoCode) {
    for (var i = 0; i < len; ++i) {			
 		//var o = new Option(objProvincials[i-1].Name,  objProvincials[i-1]._id);
 		var name=objGeoCode[i].Provincial;
+		if(name=="NA"){
+			if(level==2){
+				name='Cấp tỉnh'
+			}
+			if(level==3){
+				name=='Cấp huyện'
+			}
+			if(level==4){
+				name='Cấp xã'
+			}
+		}
 		//var geoCode=objBlockStatus[i-1].GeoCode;
 		dataProduct.addRow([name,objGeoCode[i].Total]);
 		//total=total+objBlockStatus[j].Total;
