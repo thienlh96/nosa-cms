@@ -243,6 +243,25 @@ router.get('/getWardCount', (req, res) => {
 			message: 'Bạn không có quyền xem.'
 		});
 });
+router.get('/getCountIsConcurrently', (req, res) => {
+	if (req.session == null) {
+		return res.sendStatus(401);
+	}
+	if (req.session.Level < 5) {
+		var cond = creatCond({}, req);
+		objDb.getConnection(function (client) {
+			objDb.countIsConcurrently(cond, client, function (results) {
+				console.log("getWardCount");
+				client.close();
+				res.send(results);
+			});
+		});
+	} else
+		res.json({
+			success: "false",
+			message: 'Bạn không có quyền xem.'
+		});
+});
 router.get('/getMemberBranch', (req, res) => {
 	if (req.session == null) {
 		return res.sendStatus(401);
@@ -339,12 +358,7 @@ router.get('/getBranch', (req, res) => {
 });
 router.post('/getkeyCMS', function (req, res) {
 	let body = req.body;
-	if (req.session.cms_key == null) {
-		req.session.cms_key = req.sessionID;
-		res.send(req.sessionID);
-	} else {
-		res.send(req.session.cms_key);
-	}
+	res.send(req.sessionID);
 });
 router.get('/getPosition', (req, res) => {
 	var query = {};
@@ -973,7 +987,7 @@ router.get('/getMemberCMS', auth, (req, res) => {
 	if (req.session.Level > 4) {
 		query.Level = 5;
 	}
-	console.log("GetMemberCMS query", query, req.session);
+	console.log("GetMemberCMS query", query);
 	objDb.getConnection(function (client) {
 		objDb.findMembers(query, client, function (results) {
 			client.close();

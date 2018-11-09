@@ -121,6 +121,20 @@ module.exports = {
 					callback(results);
 			});
 	},
+	countIsConcurrently: function (cond, client, callback) {
+		const db = client.db(DATA_BASE_NAME);
+		const collection = db.collection('Members');
+		console.log(cond);
+		collection.group(['IsConcurrently'], cond, {
+				"count": 0,
+			}, "function( curr, result ) {result.count++}",
+			function (err, results) {
+				if (err)
+					console.log(err);
+				else
+					callback(results);
+			});
+	},
 	getMemberBranch: function (ward,client, callback) {
 		const db = client.db(DATA_BASE_NAME);
 		const collection = db.collection('Members');
