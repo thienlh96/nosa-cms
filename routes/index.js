@@ -973,7 +973,7 @@ router.get('/getMemberCMS', auth, (req, res) => {
 	if (req.session.level >4) {
 		query.Level = 5;
 	}
-	console.log("GetMemberCMS query", query);
+	console.log("GetMemberCMS query", query, req.session);
 	objDb.getConnection(function (client) {
 		objDb.findMembers(query, client, function (results) {
 			client.close();
@@ -1130,7 +1130,7 @@ router.post('/sendbroadcast.bot', auth, (req, res) => {
 	if (req.session.level > 4) {
 		query.Level = 5;
 	}
-	console.log("Send broadcast query: ", query);
+	console.log("Send broadcast query: ", query,req.session);
 	objDb.getConnection(function (client) {
 		objDb.findMembers(query, client, function (results) {
 			//	   res.send(results);
