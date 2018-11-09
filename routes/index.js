@@ -961,6 +961,18 @@ router.get('/getMemberCMS', auth, (req, res) => {
 			Position: position
 		});
 	}
+	if(req.session.level>1){
+		query.Provincial= req.session.provincial;
+	}
+	if (req.session.level >2) {
+		query.District = req.session.district;
+	}
+	if (req.session.level >3) {
+		query.Ward = req.session.ward;
+	}
+	if (req.session.level >4) {
+		query.Level = 5;
+	}
 	console.log("GetMemberCMS query", query);
 	objDb.getConnection(function (client) {
 		objDb.findMembers(query, client, function (results) {
@@ -1106,6 +1118,18 @@ router.post('/sendbroadcast.bot', auth, (req, res) => {
 		});
 	}
 	var mess = {};
+	if (req.session.level > 1) {
+		query.Provincial = req.session.provincial;
+	}
+	if (req.session.level > 2) {
+		query.District = req.session.district;
+	}
+	if (req.session.level > 3) {
+		query.Ward = req.session.ward;
+	}
+	if (req.session.level > 4) {
+		query.Level = 5;
+	}
 	console.log("Send broadcast query: ", query);
 	objDb.getConnection(function (client) {
 		objDb.findMembers(query, client, function (results) {
