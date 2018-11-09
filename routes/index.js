@@ -961,16 +961,16 @@ router.get('/getMemberCMS', auth, (req, res) => {
 			Position: position
 		});
 	}
-	if(req.session.level>1){
-		query.Provincial= req.session.provincial;
+	if(req.session.Level>1){
+		query.Provincial = req.session.Provincial;
 	}
-	if (req.session.level >2) {
-		query.District = req.session.district;
+	if (req.session.Level > 2) {
+		query.District = req.session.District;
 	}
-	if (req.session.level >3) {
-		query.Ward = req.session.ward;
+	if (req.session.Level > 3) {
+		query.Ward = req.session.Ward;
 	}
-	if (req.session.level >4) {
+	if (req.session.Level > 4) {
 		query.Level = 5;
 	}
 	console.log("GetMemberCMS query", query, req.session);
@@ -1118,16 +1118,16 @@ router.post('/sendbroadcast.bot', auth, (req, res) => {
 		});
 	}
 	var mess = {};
-	if (req.session.level > 1) {
-		query.Provincial = req.session.provincial;
+	if (req.session.Level > 1) {
+		query.Provincial = req.session.Provincial;
 	}
-	if (req.session.level > 2) {
-		query.District = req.session.district;
+	if (req.session.Level > 2) {
+		query.District = req.session.District;
 	}
 	if (req.session.level > 3) {
-		query.Ward = req.session.ward;
+		query.Ward = req.session.Ward;
 	}
-	if (req.session.level > 4) {
+	if (req.session.Level > 4) {
 		query.Level = 5;
 	}
 	console.log("Send broadcast query: ", query,req.session);
