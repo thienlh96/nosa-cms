@@ -284,14 +284,83 @@ info = $.ajax({
         alert('Mời bạn sử dụng chatbot để lấy đường dẫn đăng nhập và mã otp mới');
     }
 });
+
+
+function sendMess() {
+
+    var name = "";
+    var provincial = "";
+    var districts = "";
+    var wards = "";
+    var position = "";
+    var layer = "";
+    var level = "";
+    if ($('#txtName').val() != "" && $('#txtName').val() != undefined)
+        name = $("#txtName").val();
+    if (cboProvincial.selectedIndex != 0)
+        provincial = cboProvincial[cboProvincial.selectedIndex].text;
+    if (cboDistricts.selectedIndex != 0)
+        districts = cboDistricts[cboDistricts.selectedIndex].text;
+    if (cboWards.selectedIndex != 0)
+        wards = cboWards[cboWards.selectedIndex].text;
+    level = cboLevel.value;
+    if (cboPosition.selectedIndex != 0)
+        position = cboPosition[cboPosition.selectedIndex].text;
+
+    if (txtMess.value == undefined || txtMess.value == "") {
+        alert("Bạn phải nhập nội dung tin nhắn");
+        txtMess.focus();
+        return;
+    };
+    var mess = {};
+    mess.Msg = txtMess.value;
+    mess.phone = $("#txtPhone").val();
+    mess.name = name;
+    mess.provincial = provincial;
+    mess.districts = districts;
+    mess.wards = wards;
+    mess.position = position;
+    mess.level = level;
+    mess.layer = "";
+    //alert(objAi.Id);
+    $.ajax({
+        type: 'POST',
+        data: JSON.stringify(mess),
+        contentType: 'application/json',
+        url: '/sendbroadcast.bot',
+        success: function (data) {
+
+            //console.log('success');
+            alert(data.ss);
+            console.log(data);
+
+        },
+        error: function (err) {
+            if (err.responseText = -'Unauthorized')
+                alert("Bạn đã bị time out");
+            window.location.href = 'login.html';
+        }
+    });
+
+
+
+}
 function SearchMember() {
-    if(datatable==null){
+    if (datatable == null) {
         datatable = $('#grvResult').DataTable({
             scrollY: 400,
             scrollX: true,
             scrollCollapse: true,
             select: true,
             dom: 'Bfrtip',
+            columnDefs: [{
+                "searchable": false,
+                "orderable": false,
+                "targets": 0
+            }],
+            order: [
+                [2, 'asc']
+            ],
             buttons: [{
                     extend: 'excelHtml5',
                 },
@@ -348,6 +417,9 @@ function SearchMember() {
                 dataSrc: ""
             },
             columns: [{
+                    defaultContent: ""
+                },
+                {
                     data: 'ImgUrl',
                     render: function (data, type, row, meta) {
                         return '<img src="' + data + '" height="80" width="80">';
@@ -389,79 +461,35 @@ function SearchMember() {
                     data: 'Email',
                     defaultContent: ""
                 },
+                {
+                    data: 'Blood_type',
+                    defaultContent: ""
+                },
+                {
+                    data: 'Hobby',
+                    defaultContent: ""
+                },
+                {
+                    data: 'Work',
+                    defaultContent: ""
+                },
+
 
             ]
         });
-    }else {
+        datatable.on('order.dt search.dt', function () {
+            datatable.column(0, {
+                search: 'applied',
+                order: 'applied'
+            }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+        }).draw();
+    } else {
         datatable.ajax.reload();
         datatable.draw();
     }
 };
-
-// function sendMess(){
-// 	    var r = confirm("Bạn có muốn gửi tin nhắn đến danh sách thành viên vừa lọc!");
-// 		if (r == true) 
-// 		{
-// 			var name = "";
-// 			var provincial = "";
-// 			var districts = "";
-// 			var wards = "";
-// 			var blockstatus = "";
-// 			var position = "";
-// 			var layer = "";
-// 			var level = "";
-// 			if ($('#txtName').val() != "" && $('#txtName').val() != undefined)
-// 					name = $("#txtName").val();
-// 			if (cboProvincial.selectedIndex != 0)
-// 				provincial = cboProvincial[cboProvincial.selectedIndex].text;
-// 			if (cboDistricts.selectedIndex != 0)
-// 				districts = cboDistricts[cboDistricts.selectedIndex].text;
-// 			if (cboWards.selectedIndex != 0)
-// 				wards = cboWards[cboWards.selectedIndex].text;
-// 			level = cboLevel.value;
-// 			if (cboPosition.selectedIndex != 0)
-// 				position = cboPosition[cboPosition.selectedIndex].text;
-
-// 			if (txtMess.value == undefined || txtMess.value == "") {
-// 				alert("Bạn phải nhập nội dung tin nhắn");			
-// 				txtMess.focus();
-// 				return;
-// 			};
-// 			var mess = {};
-// 			mess.Msg=txtMess.value;
-// 			mess.phone = $("#txtPhone").val();
-// 			mess.name = name;
-// 			mess.provincial=provincial;
-// 			mess.districts=districts;
-// 			mess.wards=wards;
-// 			mess.blockstatus=blockstatus;
-// 			mess.position=position;
-// 			mess.level = level;
-// 			mess.layer = "";
-// 			//alert(objAi.Id);
-// 			$.ajax({
-// 			type: 'POST',
-// 			data: JSON.stringify(mess),
-// 			contentType: 'application/json',
-// 			url: '/sendbroadcast.bot',				
-// 			success: function(data) 
-// 					{
-
-// 						//console.log('success');
-// 						alert(data.ss);
-// 						console.log(data);
-
-// 					},
-// 				error: function(err) {
-// 				 if(err.responseText=-'Unauthorized')
-// 				  alert("Bạn đã bị time out");
-// 				  window.location.href = 'login.html';
-// 				}
-// 		   });
-// 		}
-// }
-
-
 function loadStart() {
     $('#loading').show();
     $('#col-sm-12').hide();

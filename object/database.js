@@ -267,7 +267,7 @@ module.exports = {
 
 		const db = client.db(DATA_BASE_NAME);
 		collection = db.collection('Members');
-		collection.aggregate(pipeline, options).toArray(function (err, results) {
+		collection.aggregate(pipeline, options).sort({'Total':1}).toArray(function (err, results) {
 			if (err) {
 				console.log("err:", err);
 				callback(err);
@@ -281,9 +281,7 @@ module.exports = {
 		const db = client.db(DATA_BASE_NAME);
 		collection = db.collection('Members');
 		// Find some documents
-		collection.find(query).sort({
-			"_id": 1
-		}).toArray(function (err, results) {
+		collection.find(query).sort({'InsertDate':1}).toArray(function (err, results) {
 			//    assert.equal(err, null);
 			if (err) {
 				console.log("err:", err);
@@ -1139,5 +1137,44 @@ module.exports = {
 			//console.log('Them thanh cong :',objMember);
 			callback(null, res);
 		});
+	},
+	CountInsertDate: function (client, callback){
+		const db = client.db(DATA_BASE_NAME);
+		const collection = db.collection('MemberOTP');
+		var d= new Date();
+		d.setDate(d.getDate() - 15);
+		var query = [{
+			$match: {
+				InsertDate: {
+					$gt: d,
+				}
+			}
+		}, {
+			$group: {
+				_id: {
+					$dayOfYear: "$InsertDate"
+				},
+				"COUNT(_id)": {
+					"$sum": 1
+				}
+
+			}
+		}, {
+			"$project": {
+				"_id": 1,
+				"Total": "$COUNT(_id)"
+			}
+		}];
+		collection.aggregate(query, {}).sort({
+				"_id": 1
+			}).toArray(function (err, results) {
+			if (err) {
+				console.log("err:", err);
+				callback(err);
+			} else {
+				callback(results);
+			}
+		});
+
 	},
 }

@@ -20,8 +20,8 @@ function GetKeyCMS() {
 //GetKeyCMS();
 function Login() {
     $.ajax({
-        type: 'POST',
-        data: '',
+        type: 'GET',
+        data: {},
         contentType: 'application/json',
         url: '/getkeyCMS',
         success: function (data) {
@@ -34,6 +34,7 @@ function Login() {
             var objUser = {};
             objUser.OTP = txtUsername.value;
             objUser.psid = psid;
+            console.log(objUser);
             var ciphertext = CryptoJS.AES.encrypt(JSON.stringify(objUser), cms_key).toString();
             var dataEncrypt = { data: ciphertext };
             $.ajax({

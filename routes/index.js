@@ -26,9 +26,9 @@ router.use(session({
 	secret: 'nsvn119',
 	saveUninitialized: true,
 	resave: true,
-	cookie: {
-		expires: new Date(Date.now() + (60 * 1000 * 60))
-	} /// Set time out 1h
+	// cookie: {
+	// 	expires: new Date(Date.now() + (60 * 1000 * 60))
+	// } /// Set time out 1h
 }));
 router.use(bodyParser.urlencoded({
 	extended: false,
@@ -101,6 +101,7 @@ router.get('/mlogin', function (req, res, next) {
 router.post('/unitloginCMS', function (req, res) {
 	let body = req.body;
 	var bytes = Cryptojs.AES.decrypt(body.data, req.sessionID);
+	console.log(req.sessionID);
 	var decryptedData = JSON.parse(bytes.toString(Cryptojs.enc.Utf8));
 	if (!decryptedData.OTP || !decryptedData.psid) {
 		console.log("loginCMS failed");
@@ -129,7 +130,6 @@ router.post('/unitloginCMS', function (req, res) {
 					req.session.Level = results.Level;
 					req.session.Ward = results.Ward;
 					req.session.District = results.District;
-					console.log("session.admin", req.session.admin);
 					req.session.faceUser = true;
 					res.json({
 						result: results[0],
@@ -151,14 +151,53 @@ router.post('/unitloginCMS', function (req, res) {
 router.get('/Info',(req,res) => {
 	if (req.session.Level == null) {
 		return res.sendStatus(401);
-	}else{
-		res.send({
-		Level: req.session.Level,
-		Provincial: req.session.Provincial,
-		District: req.session.District,
-		Ward: req.session.Ward,
-		});
 	}
+	query1 = {
+		'Name': req.session.Provincial
+	};
+	query2 = {
+		'Name': req.session.District
+	};
+	query3 = {
+		'Name': req.session.Ward
+	};
+	
+	if (req.session.IdProvince != null || req.session.IdProvince != undefined)
+		return res.send({
+			Level: req.session.Level,
+			Provincial: req.session.Provincial,
+			District: req.session.District,
+			Ward: req.session.Ward,
+			IdProvince: req.session.IdProvince,
+			IdDistrict: req.session.IdDistrict,
+			IdWards: req.session.IdWards,
+		});
+	console.log(query1, query2, query3);
+	objDb.getConnection(function (client) {
+		objDb.findProvincial(query1, client, function (results) {
+			if (results.length > 0)
+				req.session.IdProvince = results[0]._id;
+			objDb.findDistrict(query2, client, function (results) {
+				if (results.length > 0)
+					req.session.IdDistrict = results[0]._id;
+				objDb.findWards(query3, client, function (results) {
+					client.close();
+					if (results.length > 0)
+						req.session.IdWards = results[0]._id;
+					console.log(req.session.IdProvince, req.session.IdDistrict, req.session.IdWards);
+					res.send({
+						Level: req.session.Level,
+						Provincial: req.session.Provincial,
+						District: req.session.District,
+						Ward: req.session.Ward,
+						IdProvince: req.session.IdProvince,
+						IdDistrict: req.session.IdDistrict,
+						IdWards: req.session.IdWards,
+					});
+				});
+			});
+		});
+	});
 });
 router.get('/getCountryCount', (req, res) => {
 	if (req.session == null) {
@@ -246,12 +285,13 @@ router.get('/getWardCount', (req, res) => {
 router.get('/getCountIsConcurrently', (req, res) => {
 	if (req.session == null) {
 		return res.sendStatus(401);
+		console.log('session null');
 	}
 	if (req.session.Level < 5) {
-		var cond = creatCond({}, req);
+		var cond = creatCond({$and: [{}]}, req);
 		objDb.getConnection(function (client) {
 			objDb.countIsConcurrently(cond, client, function (results) {
-				console.log("getWardCount");
+				console.log("getCountIsConcurrently");
 				client.close();
 				res.send(results);
 			});
@@ -356,8 +396,7 @@ router.get('/getBranch', (req, res) => {
 	});
 	//res.send(req.query.idProvincial);
 });
-router.post('/getkeyCMS', function (req, res) {
-	let body = req.body;
+router.get('/getkeyCMS', function (req, res) {
 	res.send(req.sessionID);
 });
 router.get('/getPosition', (req, res) => {
@@ -474,6 +513,14 @@ router.get('/getMemberOnline', (req, res) => {
 		console.error("getMemberOnline:", err);
 		res.send(null);
 	}
+});
+router.get('/getCountRegisterByDate',(req, res) =>{
+	objDb.getConnection(function (client) {
+		objDb.CountInsertDate(client, function (results) {
+			client.close();
+			res.send(results);
+		});
+	});
 });
 router.get('/getMemberConnect', (req, res) => {
 	res.setHeader('X-Frame-Options', 'ALLOW-FROM ' + SERVER_URL);
@@ -1267,4 +1314,40 @@ function callSendAPI(messageData) {
 			}
 		});
 };
+router.get('/getGeoocode', (req, res) => {
+	if (req.session.Level == null) {
+		return res.sendStatus(401);
+	} else {
+		query1 = {
+			'Name': req.session.Provincial
+		};
+		query2 = {
+			'Name': req.session.District
+		};
+		query3 = {
+			'Name': req.session.Ward
+		};
+		console.log(query1, query2, query3);
+		objDb.getConnection(function (client) {
+			objDb.findProvincial(query1, client, function (results) {
+				client.close();
+				if (results.length > 0)
+					req.session.IdProvince = results[0]._id;
+
+			});
+			objDb.findDistrict(query2, client, function (results) {
+				client.close();
+				if (results.length > 0)
+					req.session.IdDistrict = results[0]._id;
+
+			});
+			objDb.findWards(query3, client, function (results) {
+				client.close();
+				if (results.length > 0)
+					req.session.IdWards = results[0]._id;
+				console.log(req.session.IdProvince, req.session.IdDistrict, req.session.IdWards);
+			});
+		});
+	}
+});
 module.exports = router;

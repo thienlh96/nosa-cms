@@ -8,6 +8,14 @@ var datatable = $('#grvResult').DataTable({
     scrollCollapse: true,
     select: true,
     dom: 'Bfrtip',
+    columnDefs: [{
+            "searchable": false,
+            "orderable": false,
+            "targets": 0
+        }],
+        order: [
+            [2, 'asc']
+        ],
     buttons: [{
             extend: 'excelHtml5',
         },
@@ -56,16 +64,13 @@ var district = '';
 var provincial = '';
 var ward = '';
 var level = 4;
-function drawTable(objMembers) {
-    str='TW';
-    if(level==2)
-        str=provincial;
-    if(level==3)
-        str=district;
-    if(level==4)
-        str=ward;
-    if(level==5)
-        str='';
+function drawTable(objMembers,layer) {
+    if(layer==1)
+        str="Cấp Tỉnh";
+    if(layer==2)
+        str="Cấp Huyện";
+    if(layer==3)
+        str="Cấp Xã";
     for (var i = 0; i < objMembers.length; i++) {
         arr = Object.values(objMembers[i]);
         var pos = '';
@@ -74,9 +79,17 @@ function drawTable(objMembers) {
         });
         if(arr[0]=='NA')
             arr[0]=str;
-        datatable.row.add([arr[0], pos, arr[1]]).draw(false);
+        datatable.row.add([i,arr[0], pos, arr[1]]).draw(false);
     }
     datatable.draw();
+    datatable.on('order.dt search.dt', function () {
+        datatable.column(0, {
+            search: 'applied',
+            order: 'applied'
+        }).nodes().each(function (cell, i) {
+            cell.innerHTML = i + 1;
+        });
+    }).draw();
 }
 function render(level){
     document.getElementById('col1').innerText = level.col1;
@@ -130,7 +143,7 @@ function onCboProvincialsChange(event) {
             success: function (data) {
                 render(level2);
                 datatable.clear();
-                drawTable(data);
+                drawTable(data,1);
             }
         });
         LoadCboDistricts(value);
@@ -144,7 +157,7 @@ function onCboProvincialsChange(event) {
             success: function (data) {
                 render(level1);
                 datatable.clear();
-                drawTable(data);
+                drawTable(data,0);
             }
         });
         cboDistricts.innerHTML = '<option value="0">Tất cả </option>';
@@ -200,7 +213,7 @@ function onCboDistrictsChange(event) {
             success: function (data) {
                 render(level3);
                 datatable.clear();
-                drawTable(data);
+                drawTable(data,2);
             }
         });
     }else{
@@ -215,7 +228,7 @@ function onCboDistrictsChange(event) {
             success: function (data) {
                 render(level2);
                 datatable.clear();
-                drawTable(data);
+                drawTable(data,1);
             }
         });
         cboWards.innerHTML = '<option value="0">Tất cả</option>';
@@ -267,7 +280,7 @@ function onCboWardsChange(event) {
             success: function (data) {
                 render(level4);
                 datatable.clear();
-                drawTable(data);
+                drawTable(data,3);
             }
         });
     }else{
@@ -282,7 +295,7 @@ function onCboWardsChange(event) {
             success: function (data) {
                 render(level3);
                 datatable.clear();
-                drawTable(data);
+                drawTable(data,2);
             }
         });
     }
@@ -298,7 +311,7 @@ function LoadWeb(){
             success: function (data) {
                 render(level1);
                 datatable.clear();
-                drawTable(data);
+                drawTable(data,0);
             }
         });
     }
@@ -319,7 +332,7 @@ function LoadWeb(){
             success: function (data) {
                 render(level2);
                 datatable.clear();
-                drawTable(data);
+                drawTable(data,1);
             }
         });
         $.ajax({
@@ -359,7 +372,7 @@ function LoadWeb(){
             success: function (data) {
                 render(level3);
                 datatable.clear();
-                drawTable(data);
+                drawTable(data,2);
             }
         });
         $.ajax({
@@ -404,7 +417,7 @@ function LoadWeb(){
             success: function (data) {
                 render(level4);
                 datatable.clear();
-                drawTable(data);
+                drawTable(data,3);
             }
         });
     }
