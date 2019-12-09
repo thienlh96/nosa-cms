@@ -1,8 +1,29 @@
-FROM node:10.13-alpine
-ENV NODE_ENV production
-WORKDIR /usr/src/app
-COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
-RUN npm install --production --silent && mv node_modules ../
-COPY . .
-EXPOSE 8081
-CMD npm start
+# Set the base image to Ubuntu
+FROM    ubuntu:trusty
+
+# File Author / Maintainer
+MAINTAINER Anand Mani Sankar
+
+# Install Node.js and other dependencies
+RUN apt-get update && \
+    apt-get -y install curl && \
+    curl -sL https://deb.nodesource.com/setup | sudo bash - && \
+    apt-get -y install python build-essential nodejs
+
+# Install nodemon
+RUN npm install -g nodemon
+
+# Provides cached layer for node_modules
+ADD package.json /tmp/package.json
+RUN cd /tmp && npm install
+RUN mkdir -p /src && cp -a /tmp/node_modules /src/
+
+# Define working directory
+WORKDIR /src
+ADD . /src
+
+# Expose port
+EXPOSE  8080
+
+# Run app using nodemon
+CMD ["nodemon", "/src/index.js"]
