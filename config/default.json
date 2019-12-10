@@ -1,16 +1,9 @@
-// {
-//   "appSecret": "766c8279ac5f7925615acce2b2115a57",
-//   "pageAccessToken": "EAALVJFAnJf4BAPy4ihOugzbOJ0Bhw4HkEsH8eteOhZAnnLy2ZBMrvICnPYkGvSHq21olemATCKsbhUcVsGyIZAWIdbmkRfxZBvxGftO94RjvTGoIodKjpXD9ZCZAn0YvuTEDmZBEuBEfi8ByOhtTVsYRs4JoRVZBvGLi35dJK2kcmwZDZD",
-//   "validationToken": "OhshohT0yei7tuch5uew7rig1Ahxahte",
-//   "serverURL": "https://nosa-cms.herokuapp.com/",
-//   "mongoUrl": "mongodb://root:aicheukux4Eeg2eiThoh0aiwohvaHier@35.240.175.168:27017/?authMechanism=SCRAM-SHA-1&authSource=admin&connectTimeoutMS=30000&maxIdleTimeMS=600000",
-//   "databasename": "Nosa"
-// }
+
 {
-  "appSecret": "3f89307ad0f7ff9b28416ed0c836df68",
-  "pageAccessToken": "EAAbvSU7d21MBALiDOld1sp2oU9x6ZARk5p2688EMWq26bLsy5UHRRZB8SziuQmqNA3fhMmBzArZAed6J0XruzAMpjBlp9jCJZCORdEDPpbwYZBVIJWOU5r1qKddfgN9emZBHBPrBHpGACdUmDeboZB86IZBnoTKJZC0yLkROBWNT4VwZDZD",
-  "validationToken": "verify-token-nsvn",
-  "serverURL": "https://nosa-cms.herokuapp.com/",
+  "appSecret": "",
+  "pageAccessToken": "",
+  "validationToken": "",
+  "serverURL": "",
   "mongoUrl": "mongodb://nsvn:nsvn6688@ds251849.mlab.com:51849/heroku_g41d98gw",
   "databasename": "heroku_g41d98gw"
 }
