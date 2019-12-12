@@ -1,7 +1,7 @@
 version: '2.1'
 
 services:
-  nosa-cms:
+  nodejs:
     image: nosa-cms
     build: .
     environment:
