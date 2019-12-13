@@ -17,16 +17,12 @@ services:
     volumes:
       - web-root:/var/www/html
       - ./nginx-conf:/etc/nginx/conf.d
-      - dhparam:/etc/ssl/certs
     depends_on:
       - nodejs
     networks:
       - app-network
 
-
 volumes:
-  certbot-etc:
-  certbot-var:
   web-root:
     driver: local
     driver_opts:
