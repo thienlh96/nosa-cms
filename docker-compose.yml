@@ -34,8 +34,7 @@ services:
       - web-root:/var/www/html
     depends_on:
       - webserver
-    command: chmod +x /home/ec2-user/nosa-cms/creat_ssl.sh;/home/ec2-user/nosa-cms/creat_ssl.sh
-
+    command: echo hello
 volumes:
   certbot-etc:
   certbot-var:
