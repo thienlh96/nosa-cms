@@ -34,7 +34,7 @@ services:
       - web-root:/var/www/html
     depends_on:
       - webserver
-    command: echo hello
+    command: ['./creat_ssl.sh']
 volumes:
   certbot-etc:
   certbot-var:
