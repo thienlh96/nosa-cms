@@ -34,7 +34,6 @@ services:
       - web-root:/var/www/html
     depends_on:
       - webserver
-    command: certonly --webroot --webroot-path=/var/www/html --email thientt@kyc.net.vn --agree-tos --no-eff-email --staging -d ttt.vaytieudungtheoluong247.com  -d www.ttt.vaytieudungtheoluong247.com
 volumes:
   certbot-etc:
   certbot-var:
