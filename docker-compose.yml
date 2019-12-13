@@ -2,10 +2,15 @@ version: '2.1'
 
 services:
   nodejs:
+    nodejs:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: nosa-cms
-    build: .
-    environment:
-      NODE_ENV: production
+    container_name: nodejs
+    restart: unless-stopped
+    networks:
+      - app-network
       
   webserver:
     image: nginx:mainline-alpine
