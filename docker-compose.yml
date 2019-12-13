@@ -46,7 +46,7 @@ services:
               rm /home/ec2-user/nosa-cms/nginx-conf/nginx.conf;
               mv /home/ec2-user/nosa-cms/ssl.conf /home/ec2-user/nosa-cms/nginx_conf/;
               docker-compose up -d --force-recreate --no-deps webserver;"
-    volumes:
+volumes:
   certbot-etc:
   certbot-var:
   web-root:
