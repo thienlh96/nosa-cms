@@ -1,6 +1,6 @@
 #!/bin/bash
 
-chmod +x /home/ec2-user/nosa-cms/cron_ssl.sh
+chmod +x /home/ec2-user/nosa-cms/cron_ssl.sh;
 certonly --webroot --webroot-path=/var/www/html --email thientt@kyc.net.vn --agree-tos --no-eff-email --staging -d ttt.vaytieudungtheoluong247.com  -d www.ttt.vaytieudungtheoluong247.com;
 docker-compose stop webserver;
 mkdir dhparam;
