@@ -14,6 +14,7 @@ docker volume rm $(docker volume ls -qf)
 docker network rm `docker network ls -q`
 
 # Your installation should now be all fresh and clean.
+docker system prune -a
 
 # The following commands should not output any items:
 # docker ps -a
