@@ -11,7 +11,8 @@ const bodyParser = require('body-parser');
 
 var app = express();
 
-// view engine setup
+// view engine setup t1
+
 app.set('view engine', 'ejs');
 
 app.use(express.static(path.join(__dirname, 'public')));
